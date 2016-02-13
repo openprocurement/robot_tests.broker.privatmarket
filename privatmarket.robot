@@ -12,7 +12,7 @@ ${BROWSER}		chrome
 ${COMMONWAIT}	20
 
 ${tender_data_title}												xpath=//div[contains(@class,'title-div')]
-${tender_data_description}											css=div.description	#в наших такого нет
+${tender_data_description}											css=div.description
 ${tender_data_value.amount}											css=div[ng-if='model.budjet'] div.info-item-val
 ${tender_data_tenderID}												xpath=//div[.='Тендер ID:']/following-sibling::div
 ${tender_data_procuringEntity.name}									css=a[title='О компании']
@@ -53,8 +53,8 @@ ${locator_tenderClaim.buttonCreate}		css=button[ng-click='act.createAfp()']
 ${locator_tenderClaim.fieldPrice}		xpath=//input[@ng-model='model.price']
 ${locator_tenderClaim.fieldEmail}		css=input[ng-model='model.person.email']
 ${locator_tenderClaim.buttonSend}		css=button[ng-click='act.sendAfp()']
-${locator_tenderClaim.buttonRecall}		css=button[ng-click='act.retAfp()']
 ${locator_tenderClaim.buttonCancel}		css=button[ng-click='act.delAfp()']
+${locator_tenderClaim.buttonGoBack}		css=a[ng-click='act.ret2Ad()']
 ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 
 
@@ -100,7 +100,9 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	Wait For Ajax
 	Wait Until Element Is Visible	xpath=//div[contains(@class,'title-div')]	timeout=20
 	Wait Until Element Is Visible	css=div.info-item-val a
-	Click Element					css=div.info-item-val a
+	@{itemsList}=					Get Webelements	css=div.info-item-val a
+	:FOR	${item}	IN	@{itemsList}
+		\  Click Element					${item}
 	Mark Step						_tender_search_end
 
 Створити тендер
@@ -117,38 +119,51 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	Switch browser					${ARGUMENTS[0]}
 	Wait Until Element Contains		xpath=//div[contains(@class,'title-div')]	[ТЕСТУВАННЯ]	timeout=20
 
-	Run Keyword And Return If	'${ARGUMENTS[1]}' == 'value.amount'							Отримати число		${ARGUMENTS[1]}	0
-	Run Keyword And Return If	'${ARGUMENTS[1]}' == 'minimalStep.amount'					Отримати число		${ARGUMENTS[1]}	0
-	Run Keyword And Return If	'${ARGUMENTS[1]}' == 'items[0].classification.scheme'		Отримати строку		${ARGUMENTS[1]}	1
-	Run Keyword And Return If	'${ARGUMENTS[1]}' == 'items[0].classification.id'			Отримати строку		${ARGUMENTS[1]}	2
-	Run Keyword And Return If	'${ARGUMENTS[1]}' == 'items[0].classification.description'	Отримати класифікацію		${ARGUMENTS[1]}
-	Run Keyword And Return If	'${ARGUMENTS[1]}' == 'items[0].additionalClassifications[0].scheme'				Отримати строку	${ARGUMENTS[1]}	1
-	Run Keyword And Return If	'${ARGUMENTS[1]}' == 'items[0].additionalClassifications[0].id'					Отримати строку	${ARGUMENTS[1]}	2
-	Run Keyword And Return If	'${ARGUMENTS[1]}' == 'items[0].additionalClassifications[0].description'		Отримати класифікацію	${ARGUMENTS[1]}
-	Run Keyword And Return If	'${ARGUMENTS[1]}' == 'items[0].unit.name'					Отримати строку		${ARGUMENTS[1]}	1
-	Run Keyword And Return If	'${ARGUMENTS[1]}' == 'items[0].quantity'					Отримати ціле число	${ARGUMENTS[1]}	0
+	#check tender type
+	${item} =	Run Keyword If	'багатопредметного' in '''${TEST_NAME}'''	Отримати номер позиції	${ARGUMENTS[1]}
+		...  ELSE	Set Variable	${item}	0
+	${result} =	Отримати інформацію зі сторінки	${item}	${ARGUMENTS[1]}
+	debug
+	[return]	${result}
 
-	Run Keyword And Return If	'${ARGUMENTS[1]}' == 'items[0].deliveryAddress.postalCode'		Отримати частину адреси	${ARGUMENTS[1]}	0
-	Run Keyword And Return If	'${ARGUMENTS[1]}' == 'items[0].deliveryAddress.countryName'		Отримати частину адреси	${ARGUMENTS[1]}	1
-	Run Keyword And Return If	'${ARGUMENTS[1]}' == 'items[0].deliveryAddress.region'			Отримати частину адреси	${ARGUMENTS[1]}	2
-	Run Keyword And Return If	'${ARGUMENTS[1]}' == 'items[0].deliveryAddress.locality'		Отримати частину адреси	${ARGUMENTS[1]}	3
-	Run Keyword And Return If	'${ARGUMENTS[1]}' == 'items[0].deliveryAddress.streetAddress'	Отримати частину адреси	${ARGUMENTS[1]}	4
+Отримати інформацію зі сторінки
+	[Arguments]  ${item}  ${element}
+	[Documentation]
+	...	${item} ==  item
+	...	${element} ==  element
 
-	Run Keyword And Return If	'${ARGUMENTS[1]}' == 'enquiryPeriod.startDate'	Отримати дату та час	${ARGUMENTS[1]}	1
-	Run Keyword And Return If	'${ARGUMENTS[1]}' == 'enquiryPeriod.endDate'	Отримати дату та час	${ARGUMENTS[1]}	1
-	Run Keyword And Return If	'${ARGUMENTS[1]}' == 'tenderPeriod.startDate'	Отримати дату та час	${ARGUMENTS[1]}	1
-	Run Keyword And Return If	'${ARGUMENTS[1]}' == 'tenderPeriod.endDate'		Отримати дату та час	${ARGUMENTS[1]}	1
-	Run Keyword And Return If	'${ARGUMENTS[1]}' == 'questions[0].date'		Отримати дату та час	${ARGUMENTS[1]}	0
-	Run Keyword And Return If	'${ARGUMENTS[1]}' == 'items[0].deliveryDate.endDate'	Отримати дату та час	${ARGUMENTS[1]}	0
+	Run Keyword And Return If	'${element}' == 'value.amount'							Отримати число		${element}	0
+	Run Keyword And Return If	'${element}' == 'minimalStep.amount'					Отримати число		${element}	0
+	Run Keyword And Return If	'${element}' == 'items[${item}].classification.scheme'		Отримати строку		${element}	1
+	Run Keyword And Return If	'${element}' == 'items[${item}].classification.id'			Отримати строку		${element}	2
+	Run Keyword And Return If	'${element}}' == 'items[${item}].classification.description'	Отримати класифікацію		${element}
+	Run Keyword And Return If	'${element}' == 'items[${item}].additionalClassifications[0].scheme'				Отримати строку	${element}	1
+	Run Keyword And Return If	'${element}' == 'items[${item}].additionalClassifications[0].id'					Отримати строку	${element}	2
+	Run Keyword And Return If	'${element}' == 'items[${item}].additionalClassifications[0].description'		Отримати класифікацію	${element}
+	Run Keyword And Return If	'${element}' == 'items[${item}].unit.name'					Отримати строку		${element}	1
+	Run Keyword And Return If	'${element}' == 'items[${item}].quantity'					Отримати ціле число	${element}	0
 
-	Run Keyword If	'${ARGUMENTS[1]}' == 'questions[0].title'	Wait For Element With Reload	${tender_data_${ARGUMENTS[1]}}	2
-	Run Keyword If	'${ARGUMENTS[1]}' == 'questions[0].answer'	Wait For Element With Reload	${tender_data_${ARGUMENTS[1]}}	2
+	Run Keyword And Return If	'${element}' == 'items[${item}].deliveryAddress.postalCode'		Отримати частину адреси	${element}	0
+	Run Keyword And Return If	'${element}' == 'items[${item}].deliveryAddress.countryName'		Отримати частину адреси	${element}	1
+	Run Keyword And Return If	'${element}' == 'items[${item}].deliveryAddress.region'			Отримати частину адреси	${element}	2
+	Run Keyword And Return If	'${element}' == 'items[${item}].deliveryAddress.locality'		Отримати частину адреси	${element}	3
+	Run Keyword And Return If	'${element}' == 'items[${item}].deliveryAddress.streetAddress'	Отримати частину адреси	${element}	4
 
-	Run Keyword If	'${ARGUMENTS[1]}' == 'items[0].deliveryLocation.longitude'	Fail	None
-	Run Keyword If	'${ARGUMENTS[1]}' == 'items[0].deliveryLocation.latitude'	Fail	None
-	Wait Until Element Is Visible				${tender_data_${ARGUMENTS[1]}}	timeout=20
-	${result_full}								Get Text	${tender_data_${ARGUMENTS[1]}}
-	${result}									strip_string	${result_full}
+	Run Keyword And Return If	'${element}' == 'enquiryPeriod.startDate'	Отримати дату та час	${element}	1
+	Run Keyword And Return If	'${element}' == 'enquiryPeriod.endDate'	Отримати дату та час	${element}	1
+	Run Keyword And Return If	'${element}' == 'tenderPeriod.startDate'	Отримати дату та час	${element}	1
+	Run Keyword And Return If	'${element}' == 'tenderPeriod.endDate'		Отримати дату та час	${element}	1
+	Run Keyword And Return If	'${element}' == 'questions[0].date'		Отримати дату та час	${element}	0
+	Run Keyword And Return If	'${element}' == 'items[0].deliveryDate.endDate'	Отримати дату та час	${element}	0
+
+	Run Keyword If	'${element}' == 'questions[0].title'	Wait For Element With Reload	${tender_data_${element}}	2
+	Run Keyword If	'${element}' == 'questions[0].answer'	Wait For Element With Reload	${tender_data_${element}}	2
+
+	Run Keyword If	'${element}' == 'items[${item}].deliveryLocation.longitude'	Fail	None
+	Run Keyword If	'${element}' == 'items[${item}].deliveryLocation.latitude'	Fail	None
+	Wait Until Element Is Visible	${tender_data_${element}}	timeout=20
+	${result_full}					Get Text	${tender_data_${element}}
+	${result}						strip_string	${result_full}
 	[return]	${result}
 
 Отримати строку
@@ -201,6 +216,12 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	${reg_expresion} =				Set Variable	[A-zА-Яа-яёЁЇїІіЄєҐґ\\s]+\: \\w+[\\d\\.\\-]+ ([А-Яа-яёЁЇїІіЄєҐґ\\s,]+)
 	${result} =						get_reg_exp_matches	${reg_expresion}	${result_full}
 	[return]	${result}
+
+Отримати номер позиції
+	[Arguments]  ${element_name}
+	${item} =	get_reg_exp_matches	items\\[(\\d)\\]	${element_name}
+	Run Keyword If	'${item}' == 'none'	Set Variable	${item}	0
+	[return]  ${item}
 
 Внести зміни в тендер
 	[Arguments]  @{ARGUMENTS}
@@ -255,28 +276,14 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	[Arguments]  @{ARGUMENTS}
 	Switch browser						${ARGUMENTS[0]}
 	privatmarket.Пошук тендера по ідентифікатору	${ARGUMENTS[0]}   ${ARGUMENTS[1]}
-	Wait For Ajax
 
-	Mark Step							_clame_creation_start
-	Wait Until Element Is Visible		css=span.state-label.ng-binding
-	Mark Step							_clame_creation_get_tender_status
-
-	${tender_status} = 					Get text	css=span.state-label.ng-binding
-	Run Keyword If	'${tender_status}' == 'Период уточнений завершен'	Wait For Element With Reload		${locator_tenderClaim.buttonCreate}	1
-
-	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
-	Wait For Ajax
-	Wait For Element Value				css=input[ng-model='model.person.lastName']
-	Mark Step		 					_clame_creation_wait_data_load
-	sleep								2s
-	Wait Until Element Is Enabled		${locator_tenderClaim.fieldPrice}	20
+	Відкрити заявку
 	Mark Step							_clame_creation_set_price
 	Input Text							${locator_tenderClaim.fieldPrice}	${Arguments[2].data.value.amount}
 	click element						${locator_tenderClaim.fieldEmail}
-	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${ARGUMENTS[0]}'].login}
+	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${ARGUMENTS[0]}'].email}
 	click element						${locator_tenderClaim.fieldPrice}
 	Mark Step							_clame_creation_send_request
-
 	sleep								5s
 	Scroll Page To Element				${locator_tenderClaim.buttonSend}
 	Click Button						${locator_tenderClaim.buttonSend}
@@ -290,6 +297,19 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	${result}=							get_reg_exp_matches	Номер заявки: (\\d*),	${clame_id}	1
 	[return]	${Arguments[2]}
 
+Відкрити заявку
+	Wait For Ajax
+	Mark Step							_clame_creation_start
+	Wait Until Element Is Visible		css=span.state-label.ng-binding
+	Mark Step							_clame_creation_get_tender_status
+	${tender_status} = 					Get text	css=span.state-label.ng-binding
+	Run Keyword If	'${tender_status}' == 'Период уточнений завершен'	Wait For Element With Reload		${locator_tenderClaim.buttonCreate}	1
+	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
+	Wait For Ajax
+	Wait For Element Value				css=input[ng-model='model.person.lastName']
+	Mark Step		 					_clame_creation_wait_data_load
+	sleep								5s
+	Wait Until Element Is Enabled		${locator_tenderClaim.fieldPrice}	20
 
 Змінити цінову пропозицію
 	[Arguments]  @{ARGUMENTS}
@@ -324,43 +344,85 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Enabled		${locator_tenderClaim.buttonCreate}	${COMMONWAIT}
 	[return]	${ARGUMENTS[1]}
 
-
 Відповісти на питання
 	[Arguments]  @{ARGUMENTS}
 	Fail  None
 
 Завантажити документ в ставку
-	[Arguments]  ${user}  ${tenderId}  ${filePath}
+	[Arguments]  ${user}  ${filePath}  ${tenderId}
 	Switch browser						${user}
 	privatmarket.Пошук тендера по ідентифікатору	${user}   ${tenderId}
-	Wait For Ajax
+	Відкрити заявку
+	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${user}'].email}
 
-	Mark Step							_clame_creation_start
-	Wait Until Element Is Visible		css=span.state-label.ng-binding
-	Mark Step							_clame_creation_get_tender_status
-
-	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
-	Wait For Ajax
-	Wait For Element Value				css=input[ng-model='model.person.lastName']
-	Mark Step		 					_clame_creation_wait_data_load
-	sleep								2s
-
-	debug
+	Mark Step							_3
 	Wait Until Element Is Enabled		css=button[ng-click='act.chooseFile()']	${COMMONWAIT}
+	Scroll Page To Element				css=button[ng-click='act.chooseFile()']
 	sleep  3s
 	Mark Step							_read_file_data
-	${fileContent} =					readFileContent						${filePath}
+	Mark Step							${filePath}
+	${fileContent} =					readFileContent	${filePath}
+	${correctFilePath} = 				Replace String		${filePath}	\\	\/
 	Mark Step							${fileContent}
 
-	Execute Javascript	var scope = angular.element($("input[ng-model='model.fileName']")).scope();
-	...  var generatedFile = new File(["${fileContent}"], "${fileContent}", {type: "application/force-download", lastModified: new Date()});
-	...  scope.files[0] = generatedFile;
-	...  scope.uploadFile(scope.files[0]);
-	Wait Until Element Is Visible    xpath=(//div[contains(@class, 'file-item')])[1]   timeout=20
+	Execute Javascript	var scope = angular.element($("button[ng-click='act.chooseFile()']")).scope();
+		...  var generatedFile = new File(["${fileContent}"], "${correctFilePath}.txt", {type: "application/force-download", lastModified: new Date()});
+		...  scope.files[0] = generatedFile;
+		...  scope.uploadFile(scope.files[0]);
+
+	Wait Until Element Is Not Visible	css=div[ng-show='progressVisible'] div.progress-bar	timeout=30
+	Sleep								3s
+	Wait Until Element Is Visible		xpath=(//div[contains(@class, 'file-item')])[1]	timeout=30
+	Click Button						${locator_tenderClaim.buttonSend}
+	Close confirmation					Ваша заявка успешно обновлена!
+	${dateModified}						Get text	css=span.file-tlm
+	Click Element						${locator_tenderClaim.buttonGoBack}
+	wait until element is visible		css=table.bids tr
+	Wait For Element With Reload		xpath=//table[@class='bids']//tr[1]/td[contains(., 'Отправлена')]	1
+
+	#получим ссылку на файл и его id
+	Scroll Page To Element				css=a[ng-click='act.showDocWin(b)']
+	Click Element						css=a[ng-click='act.showDocWin(b)']
+	Wait For Ajax
+	Wait Until Element Is Enabled		css=div.modal div.file-item	5s
+	${url} = 							Execute Javascript	var scope = angular.element($("div.modal div.file-item")).scope(); return scope.file.url
+	Mark Step  							${url}
+#	${title} = 	Get Text				css=div.modal span.file-name
+	${uploaded_file_data} =				fill_file_data  ${url}  ${filePath}  ${dateModified}  ${dateModified}
+	${upload_response} = 				Create Dictionary
+	Set To Dictionary					${upload_response}	upload_response	${uploaded_file_data}
+	[return]	${upload_response}
+
+Отримати документ
+	[Arguments]  ${user}  ${tenderId}  ${url}
+	${title} = 	Get Text	css=div.modal span.file-name
+	Go To 	https://dds.privatbank.ua${url}
+	${fileText} =	Get text	css=pre
+	privatmarket.Пошук тендера по ідентифікатору	${user}	${tenderId}
+	[return]	${fileText}  ${title}
 
 Змінити документ в ставці
-	[Arguments]  @{ARGUMENTS}
-	Fail  None
+	[Arguments]  ${user}  ${filePath}  ${bidid}  ${docid}
+	Відкрити заявку
+	Scroll Page To Element				css=button[ng-click='act.chooseFile()']
+	sleep  2s
+	debug
+	Execute Javascript	var scope = angular.element($("div[ng-click='act.changeFile(file)']")).scope();
+		...  var generatedFile = new File(["${fileContent}"], "${correctFilePath}.txt", {type: "application/force-download", lastModified: new Date()});
+		...  scope.files[0] = generatedFile;
+		...  scope.uploadFile(scope.files[0]);
+
+	Wait Until Element Is Not Visible	css=div[ng-show='progressVisible'] div.progress-bar	timeout=30
+	Sleep								3s
+	Wait Until Element Is Visible		xpath=(//div[contains(@class, 'file-item')])[1]	timeout=30
+	Click Button						${locator_tenderClaim.buttonSend}
+	Close confirmation					Ваша заявка успешно обновлена!
+	debug
+	[return]  ${uploaded_file_data}
+
+Отримати пропозицію
+	{$tenderId}
+
 
 Обробити скаргу
 	[Arguments]  @{ARGUMENTS}
@@ -376,7 +438,8 @@ Login
 	Wait Until Element Is Visible	css=ul.user-menu  timeout=30
 
 Wait For Ajax
-	Wait For Condition	return window.jQuery!=undefined && jQuery.active==0	 ${COMMONWAIT}
+	Wait For Condition	return angular.element(document.body).injector().get(\'$http\').pendingRequests.length==0	${COMMONWAIT}
+	Wait For Condition	return window.jQuery!=undefined && jQuery.active==0	${COMMONWAIT}
 
 Test Fail
 	Capture and crop page screenshot	fail.jpg
@@ -403,7 +466,8 @@ Wait Visibulity And Click Element
 
 Mark Step
 	[Arguments]  ${stepName}
-	Log	${stepName}
+	log to console	_
+	log to console	${stepName}
 
 Change Feild Value
 	[Arguments]	${locator}	${value}
@@ -417,7 +481,7 @@ Change Feild Value
 Close Confirmation
 	[Arguments]	${confirmation_text}
 	Wait For Ajax
-	sleep								3s
+	sleep								5s
 	Wait Until Element Is Visible		css=p.ng-binding	${COMMONWAIT}	${COMMONWAIT}
 	Wait Until Element Contains			css=p.ng-binding	${confirmation_text}	${COMMONWAIT}
 	sleep								2s
@@ -474,6 +538,7 @@ Try Search Element
 	Mark Step							_i_start
 	Switch To Tab						${tab_number}
 	Mark Step							_i_reloaded
+	Wait For Ajax
 	Wait Until Element Is Enabled		${locator}	2
 	[return]	true
 
