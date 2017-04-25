@@ -209,7 +209,6 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 Підготувати дані для оголошення тендера
 	[Arguments]  ${username}  ${tender_data}  ${role_name}
 	${tender_data.data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data.data}
-	#${tender_data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data}
 	${adapted.data} = 	modify_test_data	${tender_data.data}
 	[Return]  ${tender_data}
 
@@ -218,21 +217,16 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	[Arguments]  ${username}
 	[Documentation]  Відкрити брaвзер, створити обєкт api wrapper, тощо
 
-	${service args}=	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
 
-	${disabled}			Create List				Chrome PDF Viewer
-	${prefs}			Create Dictionary		download.default_directory=${OUTPUT_DIR}	plugins.plugins_disabled=${disabled}
+	${prefs}  Create Dictionary  download.default_directory=${OUTPUT_DIR}
 	${chrome_options}= 	Evaluate	sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
-	Call Method	${chrome_options}		add_argument	--allow-running-insecure-content
-	Call Method	${chrome_options}		add_argument	--disable-web-security
-	Call Method	${chrome_options}		add_argument	--nativeEvents\=false
 	Call Method	${chrome_options}		add_experimental_option	prefs	${prefs}
 
     #Для Viewer'а нужен хром, т.к. на хром настроена автоматическая закачка файлов
 	Run Keyword If  '${username}' == 'PrivatMarket_Viewer'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
 	Run Keyword If  '${username}' == 'PrivatMarket_Owner'	Create WebDriver	Firefox	alias=${username}
-	Run Keyword If  '${username}' == 'PrivatMarket_Provider'	Create WebDriver	Firefox	chrome_options=${chrome_options}	alias=${username}
+	Run Keyword If  '${username}' == 'PrivatMarket_Provider'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
 	Go To	${USERS.users['${username}'].homepage}
 
 #	Open Browser	${USERS.users['${username}'].homepage}	${browser}	alias=${username}
@@ -572,7 +566,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	[Return]  ${result}
 
 
-Covert Amount To Number
+Convert Amount To Number
 	[Arguments]  ${field_name}
 	${result_full} =	Get Text	${tender_data_${field_name}}
 	${text} =	Strip String	${result_full}
@@ -592,7 +586,7 @@ Covert Amount To Number
 	Run Keyword And Return If	'${element}' == 'tenderPeriod.endDate'			Отримати дату та час	${element}	1	${item}
 	Run Keyword And Return If	'${element}' == 'questions[0].date'				Отримати дату та час	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'bids'							Перевірити присутність bids
-	Run Keyword And Return If	'${element}' == 'value.amount'	Covert Amount To Number	${element}
+	Run Keyword And Return If	'${element}' == 'value.amount'	Convert Amount To Number	${element}
 	Run Keyword And Return If	'${element}' == 'value.currency'			Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'				Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'status'						Отримати інформацію з ${element}	${element}
@@ -622,23 +616,20 @@ Covert Amount To Number
 	Run Keyword And Return If	'${element}' == 'items.deliveryDate.endDate'			Отримати дату та час	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.unit.name'						Отримати назву	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.unit.code'						Отримати код	${element}	0	${item}
-	Run Keyword And Return If	'${element}' == 'minimalStep.amount'					Covert Amount To Number	${element}
+	Run Keyword And Return If	'${element}' == 'minimalStep.amount'					Convert Amount To Number	${element}
 	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.latitude'		Отримати число	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.longitude'		Отримати число	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'				Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'procurementMethodType'					Отримати інформацію з ${element}	${element}
-#	Run Keyword And Return If	'${element}' == 'lots.value.lotMinStepAmount'	Отримати суму  Covert Amount To Number	${element}
-	Run Keyword And Return If	'${element}' == 'lots.value.amount'	Covert Amount To Number	${element}
+	Run Keyword And Return If	'${element}' == 'lots.value.amount'	Convert Amount To Number	${element}
 	Run Keyword And Return If	'${element}' == 'lots.value.currency'	Отримати інформацію з валюти	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'lots.value.valueAddedTaxIncluded'	Отримати інформацію з типу податку	${element}	${item}
-#	Run Keyword And Return If	'${element}' == 'minimalStep.currency'	Отримати інформацію з валюти	${element}	${item}
-#	Run Keyword And Return If	'${element}' == 'minimalStep.valueAddedTaxIncluded'	Отримати інформацію з типу податку	${element}	${item}
 
-	Run Keyword And Return If	'${element}' == 'minimalStep.amount'	Covert Amount To Number	${element}
+	Run Keyword And Return If	'${element}' == 'minimalStep.amount'	Convert Amount To Number	${element}
 	Run Keyword And Return If	'${element}' == 'minimalStep.currency'	Отримати інформацію з валюти	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'minimalStep.valueAddedTaxIncluded'	Отримати інформацію з типу податку	${element}	${item}
 
-	Run Keyword And Return If	'${element}' == 'lots.minimalStep.amount'	Covert Amount To Number	${element}
+	Run Keyword And Return If	'${element}' == 'lots.minimalStep.amount'	Convert Amount To Number	${element}
 	Run Keyword And Return If	'${element}' == 'lots.minimalStep.currency'	Отримати інформацію з валюти	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'lots.minimalStep.valueAddedTaxIncluded'	Отримати інформацію з типу податку	${element}	${item}
 
