@@ -645,13 +645,13 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Wait Visibility And Click Element  css=#tab_3 a
     Sleep  2s
     Wait Visibility And Click Element  css=label[for='documentation_lot_yes']
-    Wait Visibility And Click Element  xpath=//section[@data-id='lots']//select[@data-id='choseType']/option[text()='Тендерна документація']
+    Wait Visibility And Click Element  xpath=//section[@data-id='lots']//select[@data-id='choseType']/option[2]
     Sleep  1s
     Wait Visibility And Click Element  xpath=//div[@data-id='lot']//select[@data-id='choseType']//option[2]
     Sleep  1s
     Wait Visibility And Click Element  xpath=//div[@data-id='lot']//select[@data-id='choseLang']//option[2]
     Sleep  1s
-    Choose File  xpath=//div[@data-id='lot']//input[@type='file']  ${filePath}
+    Choose File  css=section[data-id='lots'] [type='file']  ${filePath}
     Sleep  5s
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait For Ajax
