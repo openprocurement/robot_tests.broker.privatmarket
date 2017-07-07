@@ -227,7 +227,7 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Wait For Ajax
     Run Keyword Unless  ${type} == 'aboveThresholdEU' or ${type} == 'aboveThresholdUA' or ${type} == 'negotiation'  Set Enquiry Period  ${tender_data.data.enquiryPeriod.startDate}  ${tender_data.data.enquiryPeriod.endDate}
     Run Keyword Unless  ${type} == 'negotiation'  Set Tender Period  ${tender_data.data.tenderPeriod.startDate}  ${tender_data.data.tenderPeriod.endDate}
-    Run Keyword If  ${type} == 'complaints'  Wait Visibility And Click Element  xpath=//span[@class='lot_budget_tax ng-scope']//label[contains(@for,'tax_')]
+    Run Keyword If  ${type} == ''  Wait Visibility And Click Element  xpath=//span[@class='lot_budget_tax ng-scope']//label[contains(@for,'tax_')]
 
     #cause
     Run Keyword If  ${type} == 'negotiation'  Обрати підставу вибору переговорної процедури  ${tender_data}
