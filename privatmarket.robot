@@ -120,7 +120,7 @@ ${tender_data_awards[0].suppliers[0].name}  css=.participant-info-block [data-id
 ${tender_data_awards[0].value.valueAddedTaxIncluded}  css=.participant-info-block [data-id='value.valueAddedTaxIncluded']
 ${tender_data_awards[0].value.currency}  css=.participant-info-block [data-id='value.currency']
 ${tender_data_awards[0].value.amount}  css=.participant-info-block [data-id='value.amount']
-${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(10) .info-item-val
+${tender_data_contracts[0].status}  css=#contractStatus
 
 
 *** Keywords ***
@@ -582,9 +582,8 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Wait For Ajax
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
     Close Confirmation In Editor  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
-    Sleep  120s
-
     Sleep  360s
+
 
 Видалити неціновий показник
     [Arguments]  ${user_name}  ${tenderId}  ${feature_id}
@@ -1003,11 +1002,15 @@ Try To Search Complaint
     [Return]  ${text}
 
 
+Відкрити детальну інформацію про контракт
+    ${class}=  Get Element Attribute  xpath=(//li[contains(@ng-class, 'lot-cont')])[1]@class
+    Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=(//li[contains(@ng-class, 'lot-cont')])[1]
+
+
 Відкрити детальну інформацію про постачальника
     ${class}=  Get Element Attribute  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]@class
     Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
-    Wait Visibility And Click Element  xpath=//img[contains(@ng-src, 'icon-plus.png')]
-    Wait Until Element Is Visible  xpath=//img[contains(@ng-src, 'icon-minus.png')]
+    Run keyword And Ignore Error  Wait Visibility And Click Element  xpath=//img[contains(@ng-src, 'icon-plus')]
 
 
 Отримати статус заявки
@@ -1022,12 +1025,17 @@ Try To Search Complaint
 
 Отримати статус договору
     [Arguments]  ${field_name}
+    Відкрити детальну інформацію про контракт
 
     Run Keyword If  'статусу підписаної угоди з постачальником' in '${TEST_NAME}'
-    ...  Wait For Element With Reload  //div[contains(@class, 'modal fade')]//div[contains(@class, 'modal-body')][1]/div[10]/div[contains(., 'Підписаний')]  1
+    ...  Wait For Element With Reload  xpath=//span[contains(., 'Підписаний') and contains(@id, 'contractStatus')]  1
 
-    Wait Until Element Is Visible  ${tender_data_${field_name}}  ${COMMONWAIT}
-    ${status_name}=  Get text  ${tender_data_${field_name}}
+    ${status}  ${status_name}=  Run Keyword And Ignore Error  Get text  ${tender_data_${field_name}}
+    ${status_name}=  Run Keyword If
+    ...  '${status}' == 'PASS'  Set Variable  ${status_name}
+    ...  ELSE  Set Variable  'Очiкує пiдписання'
+    ${status_name}=  Replace String  ${status_name}  '  ${EMPTY}
+
     ${status_type}=  Run Keyword If
     ...  'Очiкує пiдписання' == '${status_name}'  Set Variable  pending
     ...  ELSE IF  'Підписаний' == '${status_name}'  Set Variable  active
@@ -1551,7 +1559,7 @@ Try Search Element
     Reload And Switch To Tab  ${tab_number}
     Run Keyword If
     ...  '${tab_number}' == '1' and 'запитання на всі лоти' in '${TEST_NAME}'  Відкрити інформацію по запитанням на всі лоти
-    ...  ELSE IF  '${tab_number}' == '1' and 'статусу підписаної угоди з постачальником' in '${TEST_NAME}'  Відкрити детальну інформацію про постачальника
+    ...  ELSE IF  '${tab_number}' == '1' and 'статусу підписаної угоди з постачальником' in '${TEST_NAME}'  Відкрити детальну інформацію про контракт
     ...  ELSE IF  '${tab_number}' == '1'  Відкрити детальну інформацію по позиціям
     ...  ELSE IF  '${tab_number}' == '2' and 'відповіді на запитання' in '${TEST_NAME}'  Wait Visibility And Click Element  css=.question-answer .question-expand-div>a:nth-of-type(1)
     ...  ELSE IF  '${tab_number}' == '3' and 'заголовку документації' in '${TEST_NAME}'  Відкрити інформацію про вкладені файли вимоги
