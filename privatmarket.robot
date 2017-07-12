@@ -200,6 +200,12 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     ...  '${status}' == 'PASS'  Set Variable  ${type}
     ...  ELSE  Set Variable  ''
 
+    #submissionMethodDetails
+    ${submissionMethod}  ${mode}=  Run Keyword And Ignore Error  Set Variable  '${tender_data.data.submissionMethodDetails}'
+    ${mode}=  Run Keyword If
+    ...  '${submissionMethod}' == 'PASS'  Set Variable  ${mode}
+    ...  ELSE  Set Variable  ''
+
     Run Keyword IF
     ...  ${type} == 'aboveThresholdEU'  Wait Visibility And Click Element  css=a[data-id='choosedPrzAboveThresholdEU']
     ...  ELSE IF  ${type} == 'aboveThresholdUA'  Wait Visibility And Click Element  css=a[data-id='choosedPrzAboveThresholdUA']
@@ -227,7 +233,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Wait For Ajax
     Run Keyword Unless  ${type} == 'aboveThresholdEU' or ${type} == 'aboveThresholdUA' or ${type} == 'negotiation'  Set Enquiry Period  ${tender_data.data.enquiryPeriod.startDate}  ${tender_data.data.enquiryPeriod.endDate}
     Run Keyword Unless  ${type} == 'negotiation'  Set Tender Period  ${tender_data.data.tenderPeriod.startDate}  ${tender_data.data.tenderPeriod.endDate}
-    Run Keyword If  ${type} == ''  Wait Visibility And Click Element  xpath=//span[@class='lot_budget_tax ng-scope']//label[contains(@for,'tax_')]
+    Run Keyword If  'quick(mode:fast-forward)' in ${mode}  Wait Visibility And Click Element  xpath=//span[@class='lot_budget_tax ng-scope']//label[contains(@for,'tax_')]
 
     #cause
     Run Keyword If  ${type} == 'negotiation'  Обрати підставу вибору переговорної процедури  ${tender_data}
@@ -1703,17 +1709,20 @@ Get Item Number
 Завантажити документ рішення кваліфікаційної комісії
     [Arguments]  ${username}  ${document}  ${tender_uaid}  ${award_num}
     Wait Until Element Is Visible  xpath=//li[contains(@ng-class, 'lot-parts')]
-    ${class}=  Get Element Attribute  xpath=//li[contains(@ng-class, 'lot-parts')]@class
-    Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
-
-    Wait Until Keyword Succeeds  15min  10s  Wait Visibility And Click Element  xpath=//div[@class='lot-info ng-scope' and contains(.,'Кваліфікація учасників') ]//table[@class='bids']//a[@class='ng-binding']
-    Sleep  1s
+    Wait Until Keyword Succeeds  10min  10s  Дочекатися можливості завантажити документ рішення кваліфікаційної комісії
     Wait Visibility And Click Element  xpath=//div[@class='files-upload']//select[@class='form-block__select form-block__select_short']//option[2]
     Sleep  1s
     Wait Visibility And Click Element  xpath=//div[@class='files-upload']//select[@class='form-block__select ng-scope form-block__select_short']//option[3]
     Sleep  1s
     Choose File  xpath=//div[@class='files-upload']//input[@type='file']  ${document}
     Sleep  5s
+
+
+Дочекатися можливості завантажити документ рішення кваліфікаційної комісії
+    Reload Page
+    Switch To PMFrame
+    Wait Visibility And Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
+    Wait Visibility And Click Element  xpath=//div[@class='lot-info ng-scope' and contains(.,'Кваліфікація учасників') ]//table[@class='bids']//a[@class='ng-binding']
 
 
 Відповісти на вимогу про виправлення визначення переможця
