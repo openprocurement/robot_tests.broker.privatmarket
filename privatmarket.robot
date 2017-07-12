@@ -815,7 +815,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Wait Until Element Is Enabled  css=button[ng-click="act.saveContract('active')"]  ${COMMONWAIT}
     Click Button  css=button[ng-click="act.saveContract('active')"]
     Wait Until Element Is Visible  css=.notify  ${COMMONWAIT}
-    Sleep  1min
+    Sleep  3min
 
 
 Отримати інформацію зі сторінки
