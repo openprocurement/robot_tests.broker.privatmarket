@@ -126,7 +126,6 @@ ${tender_data_contracts[0].status}  css=#contractStatus
 *** Keywords ***
 Підготувати дані для оголошення тендера
     [Arguments]  ${username}  ${tender_data}  ${role_name}
-#    ${tender_data.data}=  Run Keyword If  'PrivatMarket_Owner' == '${username}'  privatmarket_service.modify_test_data  ${tender_data.data}
     ${tender_data.data}=  privatmarket_service.modify_test_data  ${tender_data.data}
     ${adapted.data}=  privatmarket_service.modify_test_data  ${tender_data.data}
     [Return]  ${tender_data}
@@ -144,7 +143,6 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Call Method  ${chrome_options}  add_argument  --disable-web-security
     Call Method  ${chrome_options}  add_argument  --nativeEvents\=false
     Call Method  ${chrome_options}  add_experimental_option  prefs  ${prefs}
-#    Call Method  ${chrome_options}  add_argument  --user-data-dir\=/home/lugovskoy/.config/google-chrome/Default
 
     #Для Viewer'а нужен хром, т.к. на хром настроена автоматическая закачка файлов
     Run Keyword If  '${username}' == 'PrivatMarket_Viewer'  Create WebDriver  Chrome  chrome_options=${chrome_options}  alias=${username}
@@ -152,7 +150,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Run Keyword If  '${username}' == 'PrivatMarket_Provider'  Create WebDriver  Firefox  chrome_options=${chrome_options}  alias=${username}
     Go To  ${USERS.users['${username}'].homepage}
 
-#    Open Browser  ${USERS.users['${username}'].homepage}  ${browser}  alias=${username}
+    #Open Browser  ${USERS.users['${username}'].homepage}  ${browser}  alias=${username}
     Set Window Size  @{USERS.users['${username}'].size}
     Set Selenium Implicit Wait  10s
     Login  ${username}
@@ -300,7 +298,6 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     ...  ELSE IF  ${type} == 'aboveThresholdUA'  Wait For Element With Reload  xpath=//div[@id='tenderStatus' and contains(., 'Подача пропозицій')]  1
     ...  ELSE IF  ${type} == 'negotiation'  Wait For Element With Reload  xpath=//div[@id='tenderStatus' and contains(., 'Звіт')]  1
     ...  ELSE  Wait For Element With Reload  xpath=//div[@id='tenderStatus' and contains(., 'Період уточнень')]  1
-
     ${tender_id}=  Get Text  ${tender_data_tenderID}
     [Return]  ${tender_id}
 
@@ -492,11 +489,6 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Wait Visibility And Click Element  css=#tab_4 a
     Wait For Ajax
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
-#    Sleep  4s
-#    Wait Until Element Is Visible  css=div.modal-body.info-div  ${COMMONWAIT}
-#    Wait Until Element Contains  css=div.modal-body.info-div  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.  ${COMMONWAIT}
-#    Wait For Ajax
-#    Reload Page
     Close Confirmation In Editor  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
 
 Змінити value.amount лоту
@@ -519,11 +511,6 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Wait Visibility And Click Element  css=#tab_4 a
     Wait For Ajax
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
-#    Sleep  4s
-#    Wait Until Element Is Visible  css=div.modal-body.info-div  ${COMMONWAIT}
-#    Wait Until Element Contains  css=div.modal-body.info-div  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.  ${COMMONWAIT}
-#    Wait For Ajax
-#    Reload Page
     Close Confirmation In Editor  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
 
 
@@ -607,11 +594,6 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Wait Visibility And Click Element  css=#tab_4 a
     Wait For Ajax
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
-#    Sleep  4s
-#    Wait Until Element Is Visible  css=div.modal-body.info-div  ${COMMONWAIT}
-#    Wait Until Element Contains  css=div.modal-body.info-div  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.  ${COMMONWAIT}
-#    Wait For Ajax
-#    Reload Page
     Close Confirmation In Editor  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
 
 
@@ -641,7 +623,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Sleep  1s
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
 
-#Дождемся подтверждения и обновим страницу, поскольку тут не выходит его закрыть
+    #Дождемся подтверждения и обновим страницу, поскольку тут не выходит его закрыть
     Wait Until Element Is Visible  css=div.modal-body.info-div  ${COMMONWAIT}
     Close Confirmation In Editor  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
     Sleep  180s
@@ -668,7 +650,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Wait For Ajax
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
 
-#Дождемся подтверждения и обновим страницу, поскольку тут не выходит его закрыть
+    #Дождемся подтверждения и обновим страницу, поскольку тут не выходит его закрыть
     Wait Until Element Is Visible  css=div.modal-body.info-div  ${COMMONWAIT}
     Close Confirmation In Editor  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
     Sleep  180s
@@ -685,7 +667,6 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     ...  '${index}' == '1'  Wait Visibility And Click Element  xpath=(//a[@ng-click='act.openQualification(q)'])[${index}]
     ...  ELSE  Wait Visibility And Click Element  xpath=(//a[@ng-click='act.openQualification(q)'])[last()]
     Wait For Ajax
-    #Wait Visibility And Click Element  xpath=//form[@name='fileForm']/select[1]/option[text()='Отчет об оценке']
     Wait Visibility And Click Element  xpath=//div[@class='files-upload']//select[@class='form-block__select form-block__select_short']//option[2]
     Sleep  1s
     Wait Visibility And Click Element  xpath=//div[@class='files-upload']//select[@class='form-block__select ng-scope form-block__select_short']//option[2]
@@ -805,7 +786,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Choose File  xpath=//div[@class='form-block__item']/form/div/input  ${document}
     Sleep  5s
     Wait Visibility And Click Element  css=button[data-id='setActive']
-    Sleep  2min
+    Sleep  3min
 
 
 Підтвердити підписання контракту
@@ -884,7 +865,6 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Run Keyword And Return If  '${field_name}' == 'deliveryLocation.latitude'  Отримати число  ${element}  0
     Run Keyword And Return If  '${field_name}' == 'deliveryLocation.longitude'  Отримати число  ${element}  0
     Run Keyword And Return If  '${field_name}' == 'additionalClassifications[0].scheme'  Отримати інформацію з ${field_name}  ${element}
-#    Run Keyword And Return If  '${field_name}' == 'classification.scheme'  Отримати інформацію з ${field_name}  ${element}
     Run Keyword And Return If  '${field_name}' == 'unit.name'  Отримати інформацію з ${field_name}  ${element}  0
     Run Keyword And Return If  '${field_name}' == 'unit.code'  Отримати інформацію з ${field_name}  ${element}
     Run Keyword And Return If  '${field_name}' == 'quantity'  Отримати суму  ${element}
@@ -1260,7 +1240,6 @@ Try To Search Complaint
     [Arguments]  ${element_name}
     privatmarket.Оновити сторінку з тендером
     Wait Until Element Is Visible  ${tender_data_${element_name}}  ${COMMONWAIT}
-    #Added sleep, becource we taketext in status bar
     Sleep  5s
     ${status_name}=  Get text  ${tender_data_${element_name}}
     ${status_type}=  privatmarket_service.get_status_type  ${status_name}
@@ -1610,7 +1589,6 @@ Check Element Attribute
 Set Date And Time
     [Arguments]  ${element}  ${fild}  ${time_element}  ${date}
     Set Date  ${element}  ${fild}  ${date}
-#    Set Time  ${time_element}  ${date}
 
 
 Set Date
