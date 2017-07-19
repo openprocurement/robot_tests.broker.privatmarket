@@ -211,9 +211,9 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     ...  ELSE  Wait Visibility And Click Element  css=a[data-id='choosedPrzBelowThreshold']
 
     Run Keyword If
-    ...  ${type} == 'negotiation'  Wait Visibility And Click Element  xpath=//select[@data_id='accelerator-select']/option[contains(., '1080')]
-    ...  ELSE IF  ${type} == ''  Wait Visibility And Click Element  xpath=//select[@data_id='accelerator-select']/option[contains(., '144 ')]
-    ...  ELSE  Wait Visibility And Click Element  xpath=//select[@data_id='accelerator-select']/option[contains(., '1440')]
+    ...  ${type} == 'negotiation'  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']/option[contains(., '1080')]
+    ...  ELSE IF  ${type} == ''  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']/option[contains(., '144 ')]
+    ...  ELSE  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']/option[contains(., '1440')]
 
 #step 0
     #we should add choosing of procurementMethodType
