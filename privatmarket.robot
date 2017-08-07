@@ -213,11 +213,12 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Wait For Ajax
     Run Keyword If
     ...  ${type} == 'negotiation'  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']/option[contains(., '1080')]
-    ...  ELSE IF  ${type} == ''  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']/option[contains(., '720 ')]
+    ...  ELSE IF  ${type} == ''  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']/option[contains(., '360 ')]
     ...  ELSE  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']/option[contains(., '1440')]
 
 #step 0
     #we should add choosing of procurementMethodType
+    Wait For Ajax
     Wait Element Visibility And Input Text  css=input[data-id='procurementName']  ${tender_data.data.title}
     Wait Element Visibility And Input Text  css=textarea[data-id='procurementDescription']  ${tender_data.data.description}
     Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=.procurementName input[data-id='procurementNameEn']  ${tender_data.data.title_en}
@@ -829,6 +830,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Run Keyword And Return If  '${field_name}' == 'causeDescription'  Отримати інформацію з ${field_name}  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'cause'  Отримати інформацію з ${field_name}  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'awards[0].complaintPeriod.endDate'  Отримати інформацію з ${field_name}  1
+    Run Keyword And Return If  '${field_name}' == 'awards[-1].complaintPeriod.endDate'  Отримати інформацію з ${field_name}  1
 
     Wait Until Element Is Visible  ${tender_data_${field_name}}
     ${result_full}=  Get Text  ${tender_data_${field_name}}
@@ -942,7 +944,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${field_name}  ${award_index}
     ${element}=  Set Variable  xpath=//div[contains(@class, 'faq') and contains(., '${complaintID}')]${tender_data_complaint.${field_name}}
     ${test_case_name}=  Remove String  ${TEST_NAME}  '
-Run Keyword If
+    Run Keyword If
     ...  '${test_case_name}' == 'Відображення поданого статусу вимоги'  Search by status  ${element}[contains(@data-status,'claim')]  3
     ...  ELSE IF  '${test_case_name}' == 'Відображення статусу answered вимоги'  Search by status  ${element}[contains(@data-status,'answered')]  3
     ...  ELSE IF  '${test_case_name}' == 'Відображення статусу resolved вимоги'  Search by status  ${element}[contains(@data-status,'resolved')]  3
@@ -952,8 +954,15 @@ Run Keyword If
     ...  ELSE IF  '${test_case_name}' == 'Відображення статусу answered вимоги про виправлення визначення переможця'  Search by status  ${element}[contains(@data-status,'answered')]  3
     ...  ELSE IF  '${test_case_name}' == 'Відображення статусу resolved вимоги про виправлення визначення переможця'  Search by status  ${element}[contains(@data-status,'resolved')]  3
     ...  ELSE IF  '${test_case_name}' == 'Відображення статусу cancelled чернетки вимоги про виправлення визначення переможця'  Search by status  ${element}[contains(@data-status,'cancelled')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу cancelled чернетки вимоги'  Search by status  ${element}[contains(@data-status,'cancelled')]  3
     ...  ELSE IF  '${test_case_name}' == 'Відображення статусу cancelled скарги про виправлення визначення переможця'  Search by status  ${element}[contains(@data-status,'cancelled')]  3
     ...  ELSE IF  '${test_case_name}' == 'Відображення статусу ignored вимоги про виправлення визначення переможця'  Search by status  ${element}[contains(@data-status,'ignored')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу declined вимоги про виправлення умов закупівлі'  Search by status  ${element}[contains(@data-status,'declined')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу invalid вимоги про виправлення умов лоту'  Search by status  ${element}[contains(@data-status,'invalid')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу invalid вимоги про виправлення умов закупівлі'  Search by status  ${element}[contains(@data-status,'invalid')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу declined вимоги про виправлення умов лоту'  Search by status  ${element}[contains(@data-status,'declined')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу cancelled чернетки вимоги про виправлення визначення переможця'  Search by status  ${element}[contains(@data-status,'cancelled')]  3
+    ...  ELSE IF  'Відображення статусу cancelled після draft -> claim вимоги' in '${test_case_name}'  Search by status  ${element}[contains(@data-status,'cancelled')]  3
     ...  ELSE IF  'Відображення статусу cancelled після draft -> claim -> answered вимоги' in '${test_case_name}'  Search by status  ${element}[contains(@data-status,'cancelled')]  3
     ...  ELSE IF  'Відображення статусу pending після draft -> claim -> answered вимоги' in '${test_case_name}'  Search by status  ${element}[contains(@data-status,'pending')]  3
     ...  ELSE  run keyword  Search by status  ${element}  3
@@ -967,7 +976,7 @@ Run Keyword If
 
 Search by status
     [Arguments]  ${locator}  ${tab_number}
-    Wait Until Keyword Succeeds  5min  10s  Try To Search Complaint  ${locator}  3
+    Wait Until Keyword Succeeds  20min  10s  Try To Search Complaint  ${locator}  3
 
 
 Try To Search Complaint
@@ -1344,6 +1353,28 @@ Try To Search Complaint
     [Return]  ${result}
 
 
+Отримати інформацію з awards[-1].complaintPeriod.endDate
+    [Arguments]  ${shift}  ${field_name}
+    Reload Page
+    Switch To PMFrame
+    ${class}=  Get Element Attribute  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]@class
+    Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
+    ${title}=  Get Element Attribute  xpath=//table[@class='bids']/tbody//td[4]/a@title
+    ${work_string}=  Get Regexp Matches  ${title}  до (.)*
+    ${work_string}=  Get From List  ${work_string}  0
+    ${work_string}=  Replace String  ${work_string}  ,${SPACE}  ${SPACE}
+    ${values_list}=  Split String  ${work_string}
+    ${day}=  Convert To Integer  ${values_list[0 + ${shift}]}
+    ${day}=  Set Variable If  ${day} < 10  0${day}  ${day}
+    ${month}=  privatmarket_service.get_month_number  ${values_list[1 + ${shift}]}
+    ${month}=  Set Variable If  ${month} < 10  0${month}  ${month}
+    ${year}=  Convert To String  ${values_list[2 + ${shift}]}
+    ${time}=  Convert To String  ${values_list[3 + ${shift}]}
+    ${date}=  Convert To String  ${year}-${month}-${day} ${time}
+    ${result}=  privatmarket_service.get_time_with_offset  ${date}
+    [Return]  ${field_name}  ${result}
+
+
 Отримати строку
     [Arguments]  ${element_name}  ${position_number}
     ${result_full}=  Отримати текст елемента  ${element_name}
@@ -1656,7 +1687,7 @@ Set Tender Period
 
 
 Wait For Ajax
-    Wait For Condition  return window.jQuery!=undefined && jQuery.active==0  300s
+    Wait For Condition  return window.jQuery!=undefined && jQuery.active==0  60s
     Sleep  2s
 
 
