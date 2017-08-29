@@ -235,7 +235,10 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     #date
     Wait For Ajax
     Run Keyword Unless  ${type} == 'aboveThresholdEU' or ${type} == 'aboveThresholdUA' or ${type} == 'negotiation'  Set Enquiry Period  ${tender_data.data.enquiryPeriod.startDate}  ${tender_data.data.enquiryPeriod.endDate}
-    Run Keyword Unless  ${type} == 'negotiation'  Set Tender Period  ${tender_data.data.tenderPeriod.startDate}  ${tender_data.data.tenderPeriod.endDate}
+    Run Keyword If  ${type} == ''  Set Start Tender Period  ${tender_data.data.tenderPeriod.startDate}
+    Run Keyword Unless  ${type} == 'negotiation'  Set End Tender Period  ${tender_data.data.tenderPeriod.endDate}
+
+    #skipAuction
     Run Keyword If  'quick(mode:fast-forward)' in ${mode}  Wait Visibility And Click Element  css=label[data-id='skip_auction']
 
     #cause
@@ -295,10 +298,10 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Switch To PMFrame
 
     Run Keyword IF
-    ...  ${type} == 'aboveThresholdEU'  Wait For Element With Reload  xpath=//div[@id='tenderStatus' and contains(., 'Подача пропозицій')]  1
-    ...  ELSE IF  ${type} == 'aboveThresholdUA'  Wait For Element With Reload  xpath=//div[@id='tenderStatus' and contains(., 'Подача пропозицій')]  1
-    ...  ELSE IF  ${type} == 'negotiation'  Wait For Element With Reload  xpath=//div[@id='tenderStatus' and contains(., 'Звіт')]  1
-    ...  ELSE  Wait For Element With Reload  xpath=//div[@id='tenderStatus' and contains(., 'Період уточнень')]  1
+    ...  ${type} == 'aboveThresholdEU'  Wait For Element With Reload  css=[data-tender-status='active.tendering']  1
+    ...  ELSE IF  ${type} == 'aboveThresholdUA'  Wait For Element With Reload  css=[data-tender-status='active.tendering']  1
+    ...  ELSE IF  ${type} == 'negotiation'  Wait For Element With Reload  css=[data-tender-status='active']  1
+    ...  ELSE  Wait For Element With Reload  css=[data-tender-status='active.enquiries']  1
     ${tender_id}=  Get Text  ${tender_data_tenderID}
     [Return]  ${tender_id}
 
@@ -466,7 +469,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
     Wait Until Element Is Visible  css=input[data-id='procurementName']  ${COMMONWAIT}
     Wait Until Keyword Succeeds  1min  10s  Звiрити value of title на сторінці редагуванння  ${user_name}
-    Run Keyword If  '${parameter}' == 'tenderPeriod'  Set Date And Time  tenderPeriod  endDate  css=input[data-id='tenderPeriodEnd']  ${value}
+    Run Keyword If  '${parameter}' == 'tenderPeriod'  Set Date  tenderPeriod  endDate  ${value}
     Run Keyword If  '${parameter}' == 'description'  Wait Element Visibility And Input Text  css=textarea[data-id='procurementDescription']  ${value}
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait Until Element Is Visible  css=section[data-id='step2']  ${COMMONWAIT}
@@ -612,7 +615,10 @@ ${tender_data_contracts[0].status}  css=#contractStatus
 Завантажити документ
     [Arguments]  ${user_name}  ${filepath}  ${tenderId}
     #перейдем к редактированию
-    Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
+    Run Keyword If
+    ...  'Неможливість' in '${TEST_NAME}'  Wait Until Element Is Visible  ${locator_tenderClaim.buttonCreate}
+    ...  ELSE  Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
+
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
     Wait Until Element Is Visible  css=input[data-id='procurementName']  ${COMMONWAIT}
     Wait Until Keyword Succeeds  1min  10s  Звiрити value of title на сторінці редагуванння  ${user_name}
@@ -644,7 +650,10 @@ ${tender_data_contracts[0].status}  css=#contractStatus
 
 Завантажити документ в лот
     [Arguments]  ${user_name}  ${filepath}  ${tenderId}  ${lot_id}
-    Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
+    Run Keyword If
+    ...  'Неможливість' in '${TEST_NAME}'  Wait Until Element Is Visible  ${locator_tenderClaim.buttonCreate}
+    ...  ELSE  Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
+
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
     Wait Until Element Is Visible  css=input[data-id='procurementName']  ${COMMONWAIT}
     Wait Until Keyword Succeeds  1min  10s  Звiрити value of title на сторінці редагуванння  ${user_name}
@@ -707,7 +716,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     [Arguments]  ${user_name}  ${tenderId}
     Wait For Element With Reload  css=button[data-id='finishPreQualBtn']  1
     Wait Visibility And Click Element  css=button[data-id='finishPreQualBtn']
-    Wait For Element With Reload  xpath=//div[@id='tenderStatus' and contains(., 'Пауза перед аукціоном')]  1
+    Wait For Element With Reload  css=[data-tender-status='active.pre-qualification.stand-still']  1
 
 
 Отримати інформацію із тендера
@@ -1632,11 +1641,6 @@ Check Element Attribute
     ${attribute}=  Get Element Attribute  ${element}@${attribute_name}
 
 
-Set Date And Time
-    [Arguments]  ${element}  ${fild}  ${time_element}  ${date}
-    Set Date  ${element}  ${fild}  ${date}
-
-
 Set Date
     [Arguments]  ${element}  ${fild}  ${date}
     Execute Javascript  var s = angular.element('[ng-controller=CreateProcurementCtrl]').scope(); s.model.ptr.${element}.${fild} = new Date(Date.parse("${date}")); s.$broadcast('periods:init'); s.$root.$apply()
@@ -1686,17 +1690,21 @@ Scroll Page To Element
 Set Enquiry Period
     [Arguments]  ${startDate}  ${endDate}
     Wait Until Element Is Visible  css=input[data-id='enquiryPeriodStart']  ${COMMONWAIT}
-    Set Date And Time  enquiryPeriod  startDate  css=input[data-id='enquiryPeriodStart']  ${startDate}
+    Set Date  enquiryPeriod  startDate  ${startDate}
     Wait Until Element Is Visible  css=input[data-id='enquiryPeriodEnd']  ${COMMONWAIT}
-    Set Date And Time  enquiryPeriod  endDate  css=input[data-id='enquiryPeriodEnd']  ${endDate}
+    Set Date  enquiryPeriod  endDate  ${endDate}
 
 
-Set Tender Period
-    [Arguments]  ${startDate}  ${endDate}
+Set Start Tender Period
+    [Arguments]  ${date}
     Wait Until Element Is Visible  css=input[data-id='tenderPeriodStart']  ${COMMONWAIT}
-    Set Date And Time  tenderPeriod  startDate  css=input[data-id='tenderPeriodStart']  ${startDate}
+    Set Date  tenderPeriod  startDate  ${date}
+
+
+Set End Tender Period
+    [Arguments]  ${date}
     Wait Until Element Is Visible  css=input[data-id='tenderPeriodEnd']  ${COMMONWAIT}
-    Set Date And Time  tenderPeriod  endDate  css=input[data-id='tenderPeriodEnd']  ${endDate}
+    Set Date  tenderPeriod  endDate  ${date}
 
 
 Wait For Ajax
@@ -1731,6 +1739,7 @@ Get Item Number
     [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${answer_data}
     privatmarket.Відповісти на вимогу про виправлення умов закупівлі  ${username}  ${tender_uaid}  ${complaintID}  ${answer_data}
 
+
 Завантажити документ рішення кваліфікаційної комісії
     [Arguments]  ${username}  ${document}  ${tender_uaid}  ${award_num}
     Wait Until Element Is Visible  xpath=//li[contains(@ng-class, 'lot-parts')]
@@ -1754,12 +1763,14 @@ Get Item Number
     [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${answer_data}  ${award_index}
     privatmarket.Відповісти на вимогу про виправлення умов закупівлі  ${username}  ${tender_uaid}  ${complaintID}  ${answer_data}
 
+
 Підтвердити постачальника
     [Arguments]  ${username}  ${tender_uaid}  ${award_num}
     Wait Until Element Is Visible  xpath=//li[contains(@ng-class, 'lot-parts')]
     ${class}=  Get Element Attribute  xpath=//li[contains(@ng-class, 'lot-parts')]@class
     Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
     Wait Visibility And Click Element  xpath=//div[@class='award-section award-actions ng-scope']//button[@data-id='setActive']
+
 
 Звiрити value of title на сторінці редагуванння
     [Arguments]  ${username}
