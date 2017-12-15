@@ -141,9 +141,6 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   Select From List  css=select[tid='data.procurementMethodType']  ${method_type}
   ${index}=  Convert To String  ${tender_data.data.minNumberOfQualifiedBids}
   Select From List By Value  css=select[tid='data.minNumberOfQualifiedBids']  ${index}
-  ${auctionPeriod_startDate}=  Отримати дату у форматі Д/М/Г  ${tender_data.data.auctionPeriod.startDate}
-  Run Keyword And Ignore Error  Input Text  css=input[tid='dgfDecisionDate']  ${auctionPeriod_startDate}
-  Run Keyword And Ignore Error  Input text  css=input[tid='data.dgfDecisionID']  ${tender_data.data.dgfID}
   Select From List  css=select[tid='data.tenderAttempts']  number:${tender_data.data.tenderAttempts}
   Input text  css=textarea[tid='data.description']  ${tender_data.data.description}
   ${amount_to_enter}=  Convert To String  ${tender_data.data.value.amount}
@@ -151,6 +148,8 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   Click Element  css=input[tid='data.value.amount']
   Run Keyword If  '${os}' == 'Linux'  Input text  css=input[tid='data.value.amount']  ${amount_to_enter}
   ...  ELSE  Input text  css=input[tid='data.value.amount']  ${amount_to_enter2}
+  ${guarantee_amount_to_enter}=  Convert To String  ${tender_data.data.guarantee.amount}
+  Input text  css=input[tid='guarantyAmount']  ${guarantee_amount_to_enter}
 
   Run Keyword If  '${tender_data.data.value.valueAddedTaxIncluded}' == 'True'  Click Element  css=input[tid='data.value.valueAddedTaxIncluded']
   ...  ELSE  Click Element  css=input[tid='data.value.valueAddedTaxNotIncluded']
