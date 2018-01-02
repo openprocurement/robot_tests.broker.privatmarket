@@ -1009,6 +1009,8 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     [Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
     Відкрити детальну інформацію по позиціям
     ${info}=  Set Variable  xpath=//div[@class='lot-info']/section[contains(., '${object_id}')]//div[@class='info-item-val']/div[@class='description']/a
+    ${element_present_status}=  Run Keyword And Return Status  Element Should Be Visible  ${element_name}
+    Run Keyword unless  ${element_present_status}  Wait For Element With Reload  ${info}  1
     ${info_class}=  Get Element Attribute  ${info}@class
     Run Keyword Unless  'checked-item' in '${info_class}'  Click Element  ${info}
     ${element}=  Set Variable  xpath=(//div[@class='lot-info']/section[contains(., '${object_id}')]${tender_data_item.${field_name}}
@@ -1746,7 +1748,8 @@ Try Search Element
     [Arguments]  ${locator}  ${tab_number}
     Reload And Switch To Tab  ${tab_number}
     Run Keyword If
-    ...  '${tab_number}' == '1' and 'запитання на всі лоти' in '${TEST_NAME}'  Відкрити інформацію по запитанням на всі лоти
+    ...  '${tab_number}' == '1' and 'запитання на всі предмети' in '${TEST_NAME}'  Відкрити інформацію по запитанням на всі лоти
+    ...  ELSE IF  '${tab_number}' == '1' and 'запитання на всі лоти' in '${TEST_NAME}'  Відкрити інформацію по запитанням на всі лоти
     ...  ELSE IF  '${tab_number}' == '1' and 'статусу підписаної угоди з постачальником' in '${TEST_NAME}'  Відкрити детальну інформацію про контракт
     ...  ELSE IF  '${tab_number}' == '1' and '${TEST_NAME}' == 'Можливість укласти угоду для закупівлі'  Відкрити детальну інформацію про контракт
     ...  ELSE IF  '${tab_number}' == '1' and '${TEST_NAME}' == 'Можливість укласти угоду для переговорної процедури'  Відкрити детальну інформацію про контракт
