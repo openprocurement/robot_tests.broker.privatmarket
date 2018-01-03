@@ -136,17 +136,15 @@ ${tender_data_contracts[0].status}  css=#contractStatus
 ${tender_data_features[0].title}  xpath=//div[@class='no-price']//span[@data-id='feature.title']
 
 ${tender_data_funders[0].name}  xpath=//td[@ng-bind='model.ad.funders[0].contactPoint.name']
-${tender_data_funders[0].address.countryName}  xpath=(//span[@data-id='address.countryName'])[2]
-${tender_data_funders[0].address.locality}  xpath=(//span[@data-id='address.locality'])[2]
-${tender_data_funders[0].address.postalCode}  xpath=(//span[@data-id='address.postalCode'])[2]
-${tender_data_funders[0].address.region}  xpath=(//span[@data-id='address.region'])[2]
-${tender_data_funders[0].address.streetAddress}  xpath=(//span[@data-id='address.streetAddress'])[2]
+${tender_data_funders[0].address.countryName}  xpath=//div[@data-id='funders-block']//span[@data-id='address.countryName']
+${tender_data_funders[0].address.locality}  xpath=//div[@data-id='funders-block']//span[@data-id='address.locality']
+${tender_data_funders[0].address.postalCode}  xpath=//div[@data-id='funders-block']//span[@data-id='address.postalCode']
+${tender_data_funders[0].address.region}  xpath=//div[@data-id='funders-block']//span[@data-id='address.region']
+${tender_data_funders[0].address.streetAddress}  xpath=//div[@data-id='funders-block']//span[@data-id='address.streetAddress']
 ${tender_data_funders[0].contactPoint.url}  xpath=//td[@ng-bind='model.ad.funders[0].contactPoint.url']
-${tender_data_funders[0].identifier.id}  xpath=//td[@ng-bind='model.ad.funders[0].identifier.id']
-${tender_data_funders[0].identifier.legalName}  xpath=//td[@ng-bind='model.ad.funders[0].identifier.scheme']
-${tender_data_funders[0].identifier.scheme}  xpath=//td[@ng-bind='model.ad.funders[0].identifier.legalName']
-
-#${tender.data.awards[0].id}  id=prozorroHash
+${tender_data_funders[0].identifier.id}  xpath=//div[@data-id='funders-block']//td[@data-id='funder-identifier-id']
+${tender_data_funders[0].identifier.legalName}  xpath=//div[@data-id='funders-block']//td[@data-id='funder-identifier-legalName']
+${tender_data_funders[0].identifier.scheme}  xpath=//div[@data-id='funders-block']//td[@data-id='funder-identifier-scheme']
 
 ${tender_data_lots[0].auctionPeriod.startDate}  id=active.auction-bd
 ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
@@ -172,7 +170,6 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     Call Method  ${chrome_options}  add_argument  --disable-web-security
     Call Method  ${chrome_options}  add_argument  --nativeEvents\=false
     Call Method  ${chrome_options}  add_experimental_option  prefs  ${prefs}
-
     #Для Viewer'а нужен хром, т.к. на хром настроена автоматическая закачка файлов
     Run Keyword If  '${username}' == 'PrivatMarket_Viewer'  Create WebDriver  Chrome  chrome_options=${chrome_options}  alias=${username}
     Run Keyword If  '${username}' == 'PrivatMarket_Owner'  Create WebDriver  Chrome  chrome_options=${chrome_options}  alias=${username}
