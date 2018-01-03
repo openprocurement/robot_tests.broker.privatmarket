@@ -93,6 +93,7 @@ ${tender_data_lot_question.questions[0].answer}  (//div[@class='question-div']/d
 
 ${tender_data_feature.featureOf}  /../../../*[1]
 
+${tender_data_complaint.complaintID}  //span[@data-id='complaint-id']
 ${tender_data_complaint.status}  //span[contains(@id, 'cmplStatus')]
 ${tender_data_complaint.resolutionType}  //div[contains(@ng-if,"resolutionType")]
 ${tender_data_complaint.resolution}  //div[@class="question-answer title ng-scope"]//div[@class="question-div"]/div[1]
@@ -853,11 +854,11 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
 
 
 Відкрити інформацію про вкладені файли вимоги
-    ${elements}=  Get Webelements  xpath=//a[contains(., 'Показати вкладені файли')]
+    ${elements}=  Get Webelements  xpath=//a[@data-id='toggle-file-section']
     ${count}=  Get_Length  ${elements}
     :FOR  ${item}  In Range  0  ${count}
     \  ${item}=  privatmarket_service.sum_of_numbers  ${item}  1
-    \  Click Element  xpath=(xpath=//a[contains(., 'Показати вкладені файли')])[${item}]
+    \  Click Element  xpath=(//a[@data-id='toggle-file-section'])[${item}]
 
 
 Відкрити детальну інформацію по лотам
@@ -1055,6 +1056,8 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     ${element}=  Set Variable If
     ...  'запитання на тендер' in '${TEST_NAME}'  xpath=(//div[contains(@class, 'faq') and contains(., '${question_id}')]${tender_data_question.${field_name}}
     ...  'запитання на всі лоти' in '${TEST_NAME}'  xpath=//div[contains(@class, 'lot-info') and contains(., '${question_id}')]${tender_data_lot_question.${field_name}}
+    ...  'запитання на всі предмети' in '${TEST_NAME}'  xpath=//div[contains(@class, 'lot-info') and contains(., '${question_id}')]${tender_data_lot_question.${field_name}}
+
 
     Run Keyword If
     ...  'запитання на тендер' in '${TEST_NAME}'  Wait For Element With Reload  ${element}  2
@@ -1116,6 +1119,10 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     ...  ELSE IF  'Відображення статусу cancelled після draft -> claim вимоги' in '${test_case_name}'  Search by status  ${element}[contains(@data-status,'cancelled')]  3
     ...  ELSE IF  'Відображення статусу cancelled після draft -> claim -> answered вимоги' in '${test_case_name}'  Search by status  ${element}[contains(@data-status,'cancelled')]  3
     ...  ELSE IF  'Відображення статусу pending після draft -> claim -> answered вимоги' in '${test_case_name}'  Search by status  ${element}[contains(@data-status,'pending')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу answered вимоги про виправлення умов закупівлі'  Search by status  ${element}[contains(@data-status,'answered')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу resolved вимоги про виправлення умов закупівлі'  Search by status  ${element}[contains(@data-status,'resolved')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу answered вимоги про виправлення умов лоту'  Search by status  ${element}[contains(@data-status,'answered')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу resolved вимоги про виправлення умов лоту'  Search by status  ${element}[contains(@data-status,'resolved')]  3
     ...  ELSE  run keyword  Search by status  ${element}  3
     ${result_full}=  Get Text  ${element}
     ${result}=  Strip String  ${result_full}
@@ -1228,6 +1235,18 @@ Try To Search Complaint
 Отримати документ до лоту
     [Arguments]  ${username}  ${tender_uaid}  ${lot_id}  ${doc_id}
     ${file_name}=  privatmarket.Отримати документ  ${username}  ${tender_uaid}  ${doc_id}
+    [Return]  ${file_name}
+
+
+Отримати документ до скарги
+    [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${doc_id}  ${award_id}=${None}
+    Wait For Element With Reload  xpath=//div[contains(@title,'${doc_id}')]  3
+    Scroll Page To Element  xpath=//div[contains(@title,'${doc_id}')]
+    Wait Visibility And Click Element  xpath=//div[contains(@title,'${doc_id}')]
+    # Добален слип, т.к. док не успевал загрузиться
+    sleep  20s
+    ${file_name_full}=  Get Text  xpath=//div[contains(@title,'${doc_id}')]
+    ${file_name}=  Strip String  ${file_name_full}
     [Return]  ${file_name}
 
 
@@ -1757,6 +1776,7 @@ Try Search Element
     ...  ELSE IF  '${tab_number}' == '1'  Відкрити детальну інформацію по позиціям
     ...  ELSE IF  '${tab_number}' == '2' and 'відповіді на запитання' in '${TEST_NAME}'  Wait Visibility And Click Element  css=.question-answer .question-expand-div>a:nth-of-type(1)
     ...  ELSE IF  '${tab_number}' == '3' and 'заголовку документації' in '${TEST_NAME}'  Відкрити інформацію про вкладені файли вимоги
+    ...  ELSE IF  '${tab_number}' == '3' and 'вмісту документа до вимоги' in '${TEST_NAME}'  Відкрити інформацію про вкладені файли вимоги
     Wait Until Element Is Enabled  ${locator}  10
     Wait For Ajax
     [Return]  True

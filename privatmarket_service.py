@@ -77,7 +77,8 @@ def get_unit_code(name):
         u'пачка': u'RM',
         u'упаковка': u'PK',
         u'гектар': u'HAR',
-        u'блок': u'D64'
+        u'блок': u'D64',
+        u'флакон': u'VI'
     }
     expected_name = dictionary.get(name)
     if expected_name:
