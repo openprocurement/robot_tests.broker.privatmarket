@@ -858,6 +858,10 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     \  Click Element  xpath=(//a[@data-id='toggle-file-section'])[${item}]
 
 
+Відкрити повну відповідь на запитання
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  css=.question-answer .question-expand-div>a:nth-of-type(1)
+
+
 Відкрити детальну інформацію по лотам
     ${elements}=  Get Webelements  xpath=//a[contains(@ng-class, 'description')]
     ${count}=  Get_Length  ${elements}
@@ -1261,11 +1265,13 @@ Try To Search Complaint
 
 Отримати посилання на аукціон для глядача
     [Arguments]  ${user}  ${tenderId}  ${object_id}=${Empty}
-    Wait For Element With Reload  css=button#takepartLink  1
-    Wait Visibility And Click Element  css=button#takepartLink
-    Wait Until Element Is Visible  xpath=//a[contains(@href, 'https://auction-sandbox.openprocurement.org/tenders/')]  timeout=30
+    Wait For Element With Reload  xpath=//a[contains(@href, 'https://auction-sandbox.openprocurement.org/tenders/')]  1  20
     ${result}=  Get Element Attribute  xpath=//a[contains(@href, 'https://auction-sandbox.openprocurement.org/tenders/')]@href
     [Return]  ${result}
+
+
+Відкрити модальне вікно з посиланням на аукціон
+    Wait Visibility And Click Element  css=button#takepartLink
 
 
 Відповісти на запитання
@@ -1756,8 +1762,8 @@ Convert Amount To Number
 
 
 Wait For Element With Reload
-    [Arguments]  ${locator}  ${tab_number}
-    Wait Until Keyword Succeeds  7min  10s  Try Search Element  ${locator}  ${tab_number}
+    [Arguments]  ${locator}  ${tab_number}  ${period}=7
+    Wait Until Keyword Succeeds  ${period}min  10s  Try Search Element  ${locator}  ${tab_number}
 
 
 Try Search Element
@@ -1770,8 +1776,9 @@ Try Search Element
     ...  ELSE IF  '${tab_number}' == '1' and '${TEST_NAME}' == 'Можливість укласти угоду для закупівлі'  Відкрити детальну інформацію про контракт
     ...  ELSE IF  '${tab_number}' == '1' and '${TEST_NAME}' == 'Можливість укласти угоду для переговорної процедури'  Відкрити детальну інформацію про контракт
     ...  ELSE IF  '${tab_number}' == '1' and 'пропозицію кваліфікації' in '${TEST_NAME}'  Wait Visibility And Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
+    ...  ELSE IF  '${tab_number}' == '1' and 'вичитати посилання на аукціон' in '${TEST_NAME}'  Відкрити модальне вікно з посиланням на аукціон
     ...  ELSE IF  '${tab_number}' == '1'  Відкрити детальну інформацію по позиціям
-    ...  ELSE IF  '${tab_number}' == '2' and 'відповіді на запитання' in '${TEST_NAME}'  Wait Visibility And Click Element  css=.question-answer .question-expand-div>a:nth-of-type(1)
+    ...  ELSE IF  '${tab_number}' == '2' and 'відповіді на запитання' in '${TEST_NAME}'  Відкрити повну відповідь на запитання
     ...  ELSE IF  '${tab_number}' == '3' and 'заголовку документації' in '${TEST_NAME}'  Відкрити інформацію про вкладені файли вимоги
     ...  ELSE IF  '${tab_number}' == '3' and 'вмісту документа до вимоги' in '${TEST_NAME}'  Відкрити інформацію про вкладені файли вимоги
     Wait Until Element Is Enabled  ${locator}  10
