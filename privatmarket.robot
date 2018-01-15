@@ -221,7 +221,7 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
 
     Wait Visibility And Click Element  xpath=//tr[@id='${tenderId}']
     Sleep  5s
-    Wait Until Element Is Visible  ${tender_data_title}  ${COMMONWAIT}
+    Wait Until Element Is Visible  ${tender_data_tenderID}  ${COMMONWAIT}
 
 
 Пошук тендера за кошти донора
@@ -320,8 +320,8 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     Wait Element Visibility And Input Text  ${locator_lotAdd.streetAddress}  ${tender_data.data.procuringEntity.address.streetAddress}
 
     #contactPoint
-    Wait Element Visibility And Input Text  css=input[data-id='fullNameUa']  ${tender_data.data.procuringEntity.contactPoint.name}
-    Run Keyword IF  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  xpath=(//input[@data-id='fullNameEn'])[1]  ${tender_data.data.procuringEntity.contactPoint.name_en}
+    Wait Element Visibility And Input Text  css=[data-id='contactPoint'] input[data-id='fullNameUa']  ${tender_data.data.procuringEntity.contactPoint.name}
+    Run Keyword IF  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='contactPoint'] input[data-id='fullNameEn']  ${tender_data.data.procuringEntity.contactPoint.name_en}
 
     ${modified_phone}=  Remove String  ${tender_data.data.procuringEntity.contactPoint.telephone}  ${SPACE}
     ${modified_phone}=  Remove String  ${modified_phone}  -
@@ -332,10 +332,10 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     Wait Element Visibility And Input Text  css=input[data-id='phone']  ${modified_phone}
     Wait Element Visibility And Input Text  css=input[data-id='email']  ${USERS.users['${username}'].email}
     Wait Element Visibility And Input Text  css=input[data-id='url']  ${tender_data.data.procuringEntity.contactPoint.url}
-    Run Keyword IF  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  xpath=(//input[@data-id='fullNameUa'])[2]  ${tender_data.data.procuringEntity.contactPoint.name}
-    Run Keyword IF  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  xpath=(//input[@data-id='fullNameEn'])[2]  ${tender_data.data.procuringEntity.contactPoint.name_en}
-    Run Keyword IF  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  xpath=(//input[@data-id='phone'])[2]  ${modified_phone}
-    Run Keyword IF  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  xpath=(//input[@data-id='email'])[2]  ${USERS.users['${username}'].email}
+    Run Keyword IF  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='addContactPoint'] input[data-id='fullNameUa']  ${tender_data.data.procuringEntity.contactPoint.name}
+    Run Keyword IF  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='addContactPoint'] input[data-id='fullNameEn']  ${tender_data.data.procuringEntity.contactPoint.name_en}
+    Run Keyword IF  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='addContactPoint'] input[data-id='phone']  ${modified_phone}
+    Run Keyword IF  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='addContactPoint'] input[data-id='email']  ${USERS.users['${username}'].email}
     Run Keyword IF  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=input[data-id='legalNameEn']  ${tender_data.data.procuringEntity.name_en}
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
 
@@ -413,7 +413,7 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     Wait Element Visibility And Input Text  xpath=//div[@data-id='lot'][${lot_index}]//div[@data-id='item'][${item_index}]//input[@data-id='description']  ${items[${index}].description}
     Wait Element Visibility And Input Text  xpath=//div[@data-id='lot'][${lot_index}]//div[@data-id='item'][${item_index}]//input[@data-id='quantity']  ${items[${index}].quantity}
     ${unitName}=  Run Keyword If
-    ...  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  privatmarket_service.get_unit_name_ru  ${items[${index}].unit.name}
+    ...  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  privatmarket_service.get_unit_name  ${items[${index}].unit.name}
     ...  ELSE  privatmarket_service.get_unit_name  ${items[${index}].unit.name}
     Wait Visibility And Click Element  xpath=//div[@data-id='lot'][${lot_index}]//div[@data-id='item'][${item_index}]//select[@data-id='unit']/option[text()='${unitName}']
 
@@ -423,6 +423,11 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     Wait Until Element Is Visible  css=input[data-id='query']  ${COMMONWAIT}
     Search By Query  css=input[data-id='query']  ${items[${index}].classification.id}
     Wait Visibility And Click Element  css=button[data-id='actConfirm']
+
+    ${classification_id}=  Get Substring  ${items[${index}].classification.id}  0  5
+    ${pre_classification_id}=  Get Substring  ${items[${index}].classification.id}  0  3
+    ${classification_status}=  Set Variable If  '${pre_classification_id}' == '33695'  ${False}  ${True}
+    Run Keyword If  '${classification_status}' == 'True' and '${pre_classification_id}' == '336'  Обрати додаткові класифікатори для лікарських засобів  ${items}  ${index}
 
     ${deliveryStartDate}=  Get Regexp Matches  ${items[${index}].deliveryDate.startDate}  (\\d{4}-\\d{2}-\\d{2})
     ${deliveryStartDate}=  Convert Date  ${deliveryStartDate[0]}  result_format=%d-%m-%Y
@@ -447,23 +452,24 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
 
     #add tender feature
     Wait Visibility And Click Element  css=label[for='features_tender_yes']
-    Wait Element Visibility And Input Text  xpath=(//input[@data-id='title'])[1]  ${features[1].title}
-    Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='ptrFeatures'] [ng-model='feature.title_en']  ${features[1].title_en}
-    Wait Element Visibility And Input Text  css=[data-id='ptrFeatures'] [ng-model='feature.description']  ${features[1].description}
-    Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='ptrFeatures'] [ng-model='feature.description_en']  ${features[1].description}
+    Wait Element Visibility And Input Text  css=input[data-id='title']  ${features[1].title}
+    Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=input[data-id='titleEn']  ${features[1].title_en}
+    Wait Element Visibility And Input Text  css=textarea[data-id='description']  ${features[1].description}
+    Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=textarea[data-id='descriptionEn']  ${features[1].description}
 
     @{tender_enums}=  Get From Dictionary  ${features[1]}  enum
     ${tender_criterion_count}=  Get Length  ${tender_enums}
 
     : FOR  ${index}  IN RANGE  0  ${tender_criterion_count}
-    \  Run Keyword Unless  '${index}' == '0'  Wait Visibility And Click Element  css=[data-id='ptrFeatures'] [data-id='criteria'] button
+    \  Run Keyword Unless  '${index}' == '0'  Wait Visibility And Click Element  css=[data-id='criteria'] button[data-id='actAdd']
     \  ${tender_criterion_value}=  privatmarket_service.get_percent  ${tender_enums[${index}].value}
     \  ${tender_criterion_value}=  Convert to String  ${tender_criterion_value}
     \  ${elem_index}=  privatmarket_service.sum_of_numbers  ${index}  1
-    \  Wait Element Visibility And Input Text  xpath=(//section[@data-id='ptrFeatures']//input[@data-id='value'])[${elem_index}]  ${tender_criterion_value}
-    \  Wait Element Visibility And Input Text  xpath=(//section[@data-id='ptrFeatures']//input[@ng-model='criterion.title'])[${elem_index}]  ${tender_enums[${index}].title}
-    \  Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  xpath=(//section[@data-id='ptrFeatures']//input[@ng-model='criterion.title_en'])[${elem_index}]  ${tender_enums[${index}].title}
+    \  Wait Element Visibility And Input Text  xpath=(//input[@data-id='criterionValue'])[${elem_index}]  ${tender_criterion_value}
+    \  Wait Element Visibility And Input Text  xpath=(//input[@data-id='criterionTitle'])[${elem_index}]  ${tender_enums[${index}].title}
+    \  Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  xpath=(//input[@data-id='criterionTitleEn'])[${elem_index}]  ${tender_enums[${index}].title}
 
+    debug
     #add lot feature
     Wait Visibility And Click Element  css=label[for='features_lots_yes']
     Wait Visibility And Click Element  css=[data-id='lot'] button[data-id='actAdd']
@@ -504,6 +510,30 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@data-id='value'])[${elem_index}]  ${item_criterion_value}
     \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@ng-model='criterion.title'])[${elem_index}]  ${item_enums[${index}].title}
     \  Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@ng-model='criterion.title_en'])[${elem_index}]  ${item_enums[${index}].title}
+
+
+Обрати додаткові класифікатори для лікарських засобів
+    [Arguments]  ${items}  ${item_index}
+    @{additionalClassifications}=  Get From Dictionary  ${items[${item_index}]}  additionalClassifications
+    ${classifications_count}=  Get Length  ${additionalClassifications}
+
+    : FOR  ${index}  IN RANGE  0  ${classifications_count}
+    \  ${id}=  Set Variable  ${items[${item_index}].additionalClassifications[${index}].id}
+    \  ${scheme}=  Set Variable  ${items[${item_index}].additionalClassifications[${index}].scheme}
+    \  Run Keyword  Додати класифікатор  ${id}  ${scheme}
+
+
+Додати класифікатор
+    [Arguments]  ${id}  ${scheme}
+    Run Keyword If  '${scheme}' == 'INN'  Wait Visibility And Click Element  xpath=(//a[@data-id='actChoose'])[2]
+    ...  ELSE  Wait Visibility And Click Element  xpath=(//a[@data-id='actChoose'])[3]
+    Wait For Ajax
+    Wait Element Visibility And Input Text  css=input[data-id='query']  ${id}
+    Wait For Ajax
+    Wait Visibility And Click Element  xpath=//label[@for='found_${id}']
+    Sleep  2s
+    Wait Visibility And Click Element  css=button[data-id='actConfirm']
+    Sleep  1s
 
 
 Обрати підставу вибору переговорної процедури
@@ -692,12 +722,14 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
 
     #загрузим файл
     Wait Visibility And Click Element  css=label[for='documentation_tender_yes']
-    Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//select[@id='chooseTypeptr']//option[2]
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//select[@data-id='filetype']//option[2]
     Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//select[@id='chooseType0']//option[2]
     Sleep  1s
-    Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//select[@id='chooseLangptr']//option[@value='en']
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//select[@data-id='filelang']//option[@value='string:en']
     Sleep  1s
-    Run Keyword And Ignore Error  Choose File  css=section[data-id='ptrDocuments'] #inputFileptr  ${filePath}
+    Run Keyword And Ignore Error  Execute Javascript  document.querySelector("input[type='file']").style = ''
+    Sleep  1s
+    Run Keyword And Ignore Error  Choose File  css=input[type='file']  ${filePath}
     Run Keyword And Ignore Error  Choose File  css=section[data-id='ptrDocuments'] #inputFile0  ${filePath}
     Sleep  5s
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}

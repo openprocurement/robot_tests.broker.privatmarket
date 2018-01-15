@@ -9,7 +9,7 @@ from pytz import timezone
 def modify_test_data(initial_data):
     #set user name
     # initial_data['procuringEntity']['name'] = u'Товариство З Обмеженою Відповідальністю \'Мак Медіа Прінт\''
-    initial_data['procuringEntity']['name'] = u'ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ \'СІЛЬСЬКОГОСПОДАРСЬКА ФІРМА \'РУБІЖНЕ\''
+    initial_data['procuringEntity']['name'] = u'Сф Рубіжне'
     initial_data['procuringEntity']['contactPoint']['telephone'] = u'+380670444580'
     initial_data['procuringEntity']['contactPoint']['url'] = u'https://dadadad.com'
     initial_data['procuringEntity']['identifier']['legalName'] = u'ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ \'СІЛЬСЬКОГОСПОДАРСЬКА ФІРМА \'РУБІЖНЕ\''
