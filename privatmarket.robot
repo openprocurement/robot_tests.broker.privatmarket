@@ -44,6 +44,8 @@ ${tender_data_qualificationPeriod.endDate}  id=active.pre-qualification-ed
 ${tender_data_causeDescription}  css=#tenderType div.question-div>div:nth-of-type(1)
 ${tender_data_cause}  css=#tenderType>.action-element
 
+${tender_data_tender.procurementMethodType}  css=[data-id='tender-type']
+
 ${tender_data_item.description}  //div[@class='description']//span)
 ${tender_data_item.deliveryDate.startDate}  //div[@ng-if='adb.deliveryDate.startDate']/div[2])
 ${tender_data_item.deliveryDate.endDate}  //div[@ng-if='adb.deliveryDate.endDate']/div[2])
@@ -201,7 +203,7 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     Wait Until Element Is Visible  ${tender_data_title}  ${COMMONWAIT}
 
 
-Оновити сторінку з планом
+Пошук плану по ідентифікатору
   [Arguments]  ${username}  ${tenderId}
     Go To  ${USERS.users['${username}'].homepage}
 #    Close notification
@@ -222,6 +224,12 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     Wait Visibility And Click Element  xpath=//tr[@id='${tenderId}']
     Sleep  5s
     Wait Until Element Is Visible  ${tender_data_tenderID}  ${COMMONWAIT}
+
+
+Оновити сторінку з планом
+    [Arguments]  ${username}  ${tenderId}
+    Reload Page
+    Sleep  2s
 
 
 Пошук тендера за кошти донора
@@ -620,7 +628,6 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     Close Confirmation In Editor  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
 
 
-
 Додати неціновий показник на лот
     [Arguments]  ${user_name}  ${tenderId}  ${feature}  ${lot_id}
     Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
@@ -813,6 +820,7 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     Wait Until Element Is Visible  css=.notify
     Підписати ЕЦП  ${index}
 
+
 Підписати ЕЦП
     [Arguments]  ${bid_index}
     Reload Page
@@ -832,7 +840,6 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     Wait Until Element Is Visible  xpath=//span[@id='PKStatusInfo' and contains(text(), 'ok')]
     Close Window
     Select Window
-
 
 
 Затвердити остаточне рішення кваліфікації
@@ -995,17 +1002,20 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     ${result}=  Strip String  ${result_full}
     [Return]  ${result}
 
+
 Отримати інформацію з questions[0].title
     [Arguments]  ${field_name}
     Wait For Element With Reload  ${tender_data_lot_question.${field_name}}  1
     ${result}=  Отримати текст елемента  ${tender_data_lot_question.${field_name}}
     [Return]  ${result}
 
+
 Отримати інформацію з questions[0].description
     [Arguments]  ${field_name}
     Wait For Element With Reload  ${tender_data_lot_question.${field_name}}  1
     ${result}=  Отримати текст елемента  ${tender_data_lot_question.${field_name}}
     [Return]  ${result}
+
 
 Отримати інформацію з questions[0].answer
     [Arguments]  ${field_name}
@@ -1058,6 +1068,16 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     ${result_full}=  Get Text  ${element}
     ${result}=  Strip String  ${result_full}
     [Return]  ${result}
+
+
+Отримати інформацію із плану
+  [Arguments]  ${username}  ${tender_uaid}  ${field_name}
+  Run Keyword And Return If  '${field_name}' == 'tender.procurementMethodType'  Отримати тип запланованого тендера  ${field_name}
+
+  Wait Until Element Is Visible  ${tender_data_${field_name}}
+  ${result_full}=  Get Text  ${tender_data_${field_name}}
+  ${result}=  Strip String  ${result_full}
+  [Return]  ${result}
 
 
 Отримати інформацію про постачальника
@@ -1169,6 +1189,13 @@ Try To Search Complaint
     Reload And Switch To Tab  ${tab_number}
     Wait For Ajax
     Wait Until Element Is Visible  ${locator}  5s
+
+
+Отримати тип запланованого тендера
+    [Arguments]  ${element}
+    ${text}=  Отримати текст елемента  ${element}
+    ${result}=  Run Keyword If  'Допорогові закупівлі' == '${text}'  Set Variable  belowThreshold
+    [Return]  ${result}
 
 
 Отримати resolutionType
