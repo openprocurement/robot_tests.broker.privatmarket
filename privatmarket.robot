@@ -460,10 +460,10 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
 
     #add tender feature
     Wait Visibility And Click Element  css=label[for='features_tender_yes']
-    Wait Element Visibility And Input Text  css=input[data-id='title']  ${features[1].title}
-    Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=input[data-id='titleEn']  ${features[1].title_en}
+    Wait Element Visibility And Input Text  css=[data-id='ptrFeatures'] [data-id='title']  ${features[1].title}
+    Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='ptrFeatures'] [data-id='titleEn']  ${features[1].title_en}
     Wait Element Visibility And Input Text  css=textarea[data-id='description']  ${features[1].description}
-    Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=textarea[data-id='descriptionEn']  ${features[1].description}
+    Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='ptrFeatures'] textarea[data-id='descriptionEn']  ${features[1].description}
 
     @{tender_enums}=  Get From Dictionary  ${features[1]}  enum
     ${tender_criterion_count}=  Get Length  ${tender_enums}
@@ -475,49 +475,48 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     \  ${elem_index}=  privatmarket_service.sum_of_numbers  ${index}  1
     \  Wait Element Visibility And Input Text  xpath=(//input[@data-id='criterionValue'])[${elem_index}]  ${tender_criterion_value}
     \  Wait Element Visibility And Input Text  xpath=(//input[@data-id='criterionTitle'])[${elem_index}]  ${tender_enums[${index}].title}
-    \  Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  xpath=(//input[@data-id='criterionTitleEn'])[${elem_index}]  ${tender_enums[${index}].title}
+    \  Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  xpath=(//section[@data-id='ptrFeatures']//input[@data-id='criterionTitleEn'])[${elem_index}]  ${tender_enums[${index}].title}
 
-    debug
     #add lot feature
     Wait Visibility And Click Element  css=label[for='features_lots_yes']
     Wait Visibility And Click Element  css=[data-id='lot'] button[data-id='actAdd']
-    Wait Element Visibility And Input Text  css=[data-id='lot'] [ng-model='feature.title']  ${features[0].title}
-    Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='lot'] [ng-model='feature.title_en']  ${features[0].title_en}
-    Wait Element Visibility And Input Text  css=[data-id='lot'] [ng-model='feature.description']  ${features[0].description}
-    Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='lot'] [ng-model='feature.description_en']  ${features[0].description}
+    Wait Element Visibility And Input Text  css=[data-id='lot'] [data-id='title']  ${features[0].title}
+    Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='lot'] [data-id='titleEn']  ${features[0].title_en}
+    Wait Element Visibility And Input Text  css=[data-id='lot'] [data-id='description']  ${features[0].description}
+    Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='lot'] [data-id='descriptionEn']  ${features[0].description}
 
     @{lot_enums}=  Get From Dictionary  ${features[0]}  enum
     ${lot_criterion_count}=  Get Length  ${lot_enums}
 
     : FOR  ${index}  IN RANGE  0  ${lot_criterion_count}
-    \  Run Keyword Unless  '${index}' == '0'  Wait Visibility And Click Element  css=[data-id='lot'] [data-id='criteria'] button
+    \  Run Keyword Unless  '${index}' == '0'  Wait Visibility And Click Element  css=[data-id='lot'] [data-id='criteria'] button[data-id='actAdd']
     \  ${lot_criterion_value}=  privatmarket_service.get_percent  ${lot_enums[${index}].value}
     \  ${lot_criterion_value}=  Convert to String   ${lot_criterion_value}
     \  ${elem_index}=  privatmarket_service.sum_of_numbers  ${index}  1
-    \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='lot']//input[@data-id='value'])[${elem_index}]  ${lot_criterion_value}
-    \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='lot']//input[@ng-model='criterion.title'])[${elem_index}]  ${lot_enums[${index}].title}
-    \  Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  xpath=(//div[@data-id='lot']//input[@ng-model='criterion.title_en'])[${elem_index}]  ${lot_enums[${index}].title}
+    \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='lot']//input[@data-id='criterionValue'])[${elem_index}]  ${lot_criterion_value}
+    \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='lot']//input[@data-id='criterionTitle'])[${elem_index}]  ${lot_enums[${index}].title}
+    \  Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  xpath=(//div[@data-id='lot']//input[@data-id='criterionTitleEn'])[${elem_index}]  ${lot_enums[${index}].title}
 
     #add item feature
-    Wait Visibility And Click Element  css=label[for='features_item_yes']
+    Wait Visibility And Click Element  css=label[for='features_items_yes']
     Wait Visibility And Click Element  css=[data-id='item'] button[data-id='actAdd']
-    Wait Element Visibility And Input Text  css=[data-id='item'] [ng-model='feature.title']  ${features[2].title}
-    Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='item'] [ng-model='feature.title_en']  ${features[2].title_en}
-    Wait Element Visibility And Input Text  css=[data-id='item'] [ng-model='feature.description']  ${features[2].description}
-    Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='item'] [ng-model='feature.description_en']  ${features[2].description}
+    Wait Element Visibility And Input Text  css=[data-id='item'] [data-id='title']  ${features[2].title}
+    Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='item'] [data-id='titleEn']  ${features[2].title_en}
+    Wait Element Visibility And Input Text  css=[data-id='item'] [data-id='description']  ${features[2].description}
+    Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='item'] [data-id='descriptionEn']  ${features[2].description}
 
 
     @{item_enums}=  Get From Dictionary  ${features[2]}  enum
     ${item_criterion_count}=  Get Length  ${item_enums}
 
     : FOR  ${index}  IN RANGE  0  ${item_criterion_count}
-    \  Run Keyword Unless  '${index}' == '0'  Wait Visibility And Click Element  css=[data-id='item'] [data-id='criteria'] button
+    \  Run Keyword Unless  '${index}' == '0'  Wait Visibility And Click Element  css=[data-id='item'] [data-id='criteria'] button[data-id='actAdd']
     \  ${item_criterion_value}=  privatmarket_service.get_percent  ${item_enums[${index}].value}
     \  ${item_criterion_value}=  Convert to String   ${item_criterion_value}
     \  ${elem_index}=  privatmarket_service.sum_of_numbers  ${index}  1
-    \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@data-id='value'])[${elem_index}]  ${item_criterion_value}
-    \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@ng-model='criterion.title'])[${elem_index}]  ${item_enums[${index}].title}
-    \  Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@ng-model='criterion.title_en'])[${elem_index}]  ${item_enums[${index}].title}
+    \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@data-id='criterionValue'])[${elem_index}]  ${item_criterion_value}
+    \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@data-id='criterionTitle'])[${elem_index}]  ${item_enums[${index}].title}
+    \  Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@data-id='criterionTitleEn'])[${elem_index}]  ${item_enums[${index}].title}
 
 
 Обрати додаткові класифікатори для лікарських засобів
@@ -535,11 +534,7 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     [Arguments]  ${id}  ${scheme}
     Run Keyword If  '${scheme}' == 'INN'  Wait Visibility And Click Element  xpath=(//a[@data-id='actChoose'])[2]
     ...  ELSE  Wait Visibility And Click Element  xpath=(//a[@data-id='actChoose'])[3]
-    Wait For Ajax
-    Wait Element Visibility And Input Text  css=input[data-id='query']  ${id}
-    Wait For Ajax
-    Wait Visibility And Click Element  xpath=//label[@for='found_${id}']
-    Sleep  2s
+    Search By Query  css=input[data-id='query']  ${id}
     Wait Visibility And Click Element  css=button[data-id='actConfirm']
     Sleep  1s
 
