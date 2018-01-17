@@ -214,7 +214,7 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
     ${class}=  Get Element Attribute  xpath=//span[@data-id='pinhead']@class
     Run Keyword If  'color-green' in '${class}'  Click Element  css=[data-id='pinhead']
 
-    Wait Visibility And Click Element  css=label[for='ttype-plans']
+    Wait Visibility And Click Element  css=[data-id='ttype-plans-label']
 
     ${suite_name}=  Convert To Lowercase  ${SUITE_NAME}
     ${education_type}=  Run Keyword If  'negotiation' in '${suite_name}'  Set Variable  False
@@ -1769,7 +1769,7 @@ Try Search Tender
     Check Current Mode New Realisation
 
     #выберем поиск по планам закупок
-    Run Keyword If  '${type}' == 'plan'  Wait Visibility And Click Element  css=label[for='ttype-plans']
+    Run Keyword If  '${type}' == 'plan'  Wait Visibility And Click Element  css=[data-id='ttype-plans-label']
 
     #заполним поле поиска
     Clear Element Text  ${locator_tenderSearch.searchInput}
