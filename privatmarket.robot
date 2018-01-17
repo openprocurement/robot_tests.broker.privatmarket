@@ -46,13 +46,7 @@ ${tender_data_cause}  css=#tenderType>.action-element
 
 ${tender_data_tender.procurementMethodType}  css=span[data-id='tender-type']
 ${tender_data_budget.amount}  css=#tenderBudget
-${tender_data_budget.description}  css=.lot-info>.bold
-${tender_data_procuringEntity.identifier.scheme}  css=.delivery-info-container tr:nth-of-type(2)>td:nth-of-type(1)
-${tender_data_procuringEntity.identifier.id}  css=.delivery-info-container tr:nth-of-type(2)>td:nth-of-type(2)
-${tender_data_procuringEntity.identifier.legalName}  css=.delivery-info-container tr:nth-of-type(2)>td:nth-of-type(3)
-
-
-
+${tender_data_budget.description}  css=div[data-id='lot-description']
 
 ${tender_data_item.description}  //div[@class='description']//span)
 ${tender_data_item.deliveryDate.startDate}  //div[@ng-if='adb.deliveryDate.startDate']/div[2])
@@ -121,9 +115,9 @@ ${tender_data_procuringEntity.address.streetAddress}  css=.delivery-info-contain
 ${tender_data_procuringEntity.contactPoint.name}  css=[data-id='contactPoint.name']
 ${tender_data_procuringEntity.contactPoint.telephone}  css=[data-id='contactPoint.telephone']
 ${tender_data_procuringEntity.contactPoint.url}  css=[data-id='contactPoint.url']
-#${tender_data_procuringEntity.identifier.legalName}  css=[data-id='identifier.legalName']
-#${tender_data_procuringEntity.identifier.scheme}  css=[data-id='identifier.scheme']
-#${tender_data_procuringEntity.identifier.id}  css=[data-id='identifier.id']
+${tender_data_procuringEntity.identifier.legalName}  css=[data-id='identifier.legalName']
+${tender_data_procuringEntity.identifier.scheme}  css=[data-id='identifier.scheme']
+${tender_data_procuringEntity.identifier.id}  css=[data-id='identifier.id']
 
 ${tender_data_awards[0].documents[0].title}  css=.participant-info-block .doc-file-title
 ${tender_data_awards[0].status}  xpath=//div[@data-id='status']
