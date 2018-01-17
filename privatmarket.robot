@@ -24,12 +24,12 @@ ${locator_tenderCreation.buttonSend}  css=button[data-id='actSend']
 ${locator_tenderClaim.buttonCreate}  css=button[data-id='editProcBtn']
 
 ${tender_data_title}  css=.title-div [data-id='tender-full-title']
-${tender_data_description}  id=tenderDescription
-${tender_data_procurementMethodType}  id=tenderType
-${tender_data_status}  id=tenderStatus
-${tender_data_value.amount}  id=tenderBudget
-${tender_data_value.currency}  id=tenderBudgetCcy
-${tender_data_value.valueAddedTaxIncluded}  id=tenderBudgetTax
+${tender_data_description}  css=#tenderDescription
+${tender_data_procurementMethodType}  css=#tenderType
+${tender_data_status}  css=#tenderStatus
+${tender_data_value.amount}  css=#tenderBudget
+${tender_data_value.currency}  css=#tenderBudgetCcy
+${tender_data_value.valueAddedTaxIncluded}  css=#tenderBudgetTax
 ${tender_data_tenderID}  css=#tenderId
 ${tender_data_procuringEntity.name}  css=a[ng-click='commonActions.openCard()']
 ${tender_data_enquiryPeriod.startDate}  id=active.enquiries-bd
@@ -44,7 +44,15 @@ ${tender_data_qualificationPeriod.endDate}  id=active.pre-qualification-ed
 ${tender_data_causeDescription}  css=#tenderType div.question-div>div:nth-of-type(1)
 ${tender_data_cause}  css=#tenderType>.action-element
 
-${tender_data_tender.procurementMethodType}  css=[data-id='tender-type']
+${tender_data_tender.procurementMethodType}  css=span[data-id='tender-type']
+${tender_data_budget.amount}  css=#tenderBudget
+${tender_data_budget.description}  css=.lot-info>.bold
+${tender_data_procuringEntity.identifier.scheme}  css=.delivery-info-container tr:nth-of-type(2)>td:nth-of-type(1)
+${tender_data_procuringEntity.identifier.id}  css=.delivery-info-container tr:nth-of-type(2)>td:nth-of-type(2)
+${tender_data_procuringEntity.identifier.legalName}  css=.delivery-info-container tr:nth-of-type(2)>td:nth-of-type(3)
+
+
+
 
 ${tender_data_item.description}  //div[@class='description']//span)
 ${tender_data_item.deliveryDate.startDate}  //div[@ng-if='adb.deliveryDate.startDate']/div[2])
@@ -103,7 +111,7 @@ ${tender_data_complaint.satisfied}  //span[contains(@data-id, 'satisfied')]
 ${tender_data_complaint.cancellationReason}  //*[@description='q.cancellationReason']/div/div[1]
 ${tender_data_complaint.title}  //span[contains(@class, 'claimHead')]
 ${tender_data_complaint.description}  //div[@class='question-div']
-${tender_data_complaintPeriod.endDate}  id=cmplPeriodEnd
+${tender_data_complaintPeriod.endDate}  css=#cmplPeriodEnd
 
 ${tender_data_procuringEntity.address.countryName}  css=.delivery-info-container [data-id='address.countryName']
 ${tender_data_procuringEntity.address.locality}  css=.delivery-info-container [data-id='address.locality']
@@ -113,9 +121,9 @@ ${tender_data_procuringEntity.address.streetAddress}  css=.delivery-info-contain
 ${tender_data_procuringEntity.contactPoint.name}  css=[data-id='contactPoint.name']
 ${tender_data_procuringEntity.contactPoint.telephone}  css=[data-id='contactPoint.telephone']
 ${tender_data_procuringEntity.contactPoint.url}  css=[data-id='contactPoint.url']
-${tender_data_procuringEntity.identifier.legalName}  css=[data-id='identifier.legalName']
-${tender_data_procuringEntity.identifier.scheme}  css=[data-id='identifier.scheme']
-${tender_data_procuringEntity.identifier.id}  css=[data-id='identifier.id']
+#${tender_data_procuringEntity.identifier.legalName}  css=[data-id='identifier.legalName']
+#${tender_data_procuringEntity.identifier.scheme}  css=[data-id='identifier.scheme']
+#${tender_data_procuringEntity.identifier.id}  css=[data-id='identifier.id']
 
 ${tender_data_awards[0].documents[0].title}  css=.participant-info-block .doc-file-title
 ${tender_data_awards[0].status}  xpath=//div[@data-id='status']
@@ -148,8 +156,8 @@ ${tender_data_funders[0].identifier.id}  xpath=//div[@data-id='funders-block']//
 ${tender_data_funders[0].identifier.legalName}  xpath=//div[@data-id='funders-block']//td[@data-id='funder-identifier-legalName']
 ${tender_data_funders[0].identifier.scheme}  xpath=//div[@data-id='funders-block']//td[@data-id='funder-identifier-scheme']
 
-${tender_data_lots[0].auctionPeriod.startDate}  id=active.auction-bd
-${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
+${tender_data_lots[0].auctionPeriod.startDate}  css=#active.auction-bd
+${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
 
 
 *** Keywords ***
@@ -1066,13 +1074,16 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
 
 
 Отримати інформацію із плану
-  [Arguments]  ${username}  ${tender_uaid}  ${field_name}
-  Run Keyword And Return If  '${field_name}' == 'tender.procurementMethodType'  Отримати тип запланованого тендера  ${field_name}
+    [Arguments]  ${username}  ${tender_uaid}  ${field_name}
+    Run Keyword And Return If  '${field_name}' == 'tender.procurementMethodType'  Отримати тип запланованого тендера  ${field_name}
+    Run Keyword And Return If  '${field_name}' == 'budget.amount'  Convert Amount To Number  ${tender_data_value.amount}
+    Run Keyword And Return If  '${field_name}' == 'budget.currency'  Отримати інформацію з value.currency  value.currency
 
-  Wait Until Element Is Visible  ${tender_data_${field_name}}
-  ${result_full}=  Get Text  ${tender_data_${field_name}}
-  ${result}=  Strip String  ${result_full}
-  [Return]  ${result}
+
+    Wait Until Element Is Visible  ${tender_data_${field_name}}
+    ${result_full}=  Get Text  ${tender_data_${field_name}}
+    ${result}=  Strip String  ${result_full}
+    [Return]  ${result}
 
 
 Отримати інформацію про постачальника
@@ -1188,6 +1199,7 @@ Try To Search Complaint
 
 Отримати тип запланованого тендера
     [Arguments]  ${element}
+    Wait For Ajax
     ${text}=  Отримати текст елемента  ${element}
     ${result}=  Run Keyword If  'Допорогові закупівлі' == '${text}'  Set Variable  belowThreshold
     [Return]  ${result}
