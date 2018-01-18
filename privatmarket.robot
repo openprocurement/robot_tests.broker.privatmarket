@@ -734,16 +734,13 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
     Sleep  1s
     Run Keyword And Ignore Error  Choose File  css=section[data-id='ptrDocuments'] input[type='file']  ${filePath}
     Sleep  5s
-    debug
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait For Ajax
-    debug
     Wait Until Element Is Visible  css=section[data-id='step5']  ${COMMONWAIT}
     Sleep  1s
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
 
     #Дождемся подтверждения и обновим страницу, поскольку тут не выходит его закрыть
-    Wait Until Element Is Visible  css=div.modal-body.info-div  ${COMMONWAIT}
     Close Confirmation In Editor  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
     Sleep  180s
 
@@ -769,7 +766,6 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
     Sleep  1s
     Choose File  css=div[data-id='lot'] input[type='file']  ${filePath}
     Sleep  5s
-    debug
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait For Ajax
     Wait Until Element Is Visible  css=section[data-id='step5']  ${COMMONWAIT}
@@ -777,7 +773,6 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
 
     #Дождемся подтверждения и обновим страницу, поскольку тут не выходит его закрыть
-    Wait Until Element Is Visible  css=div.modal-body.info-div  ${COMMONWAIT}
     Close Confirmation In Editor  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
     Sleep  180s
 
