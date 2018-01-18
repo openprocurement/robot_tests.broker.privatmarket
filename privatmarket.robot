@@ -1071,6 +1071,8 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
 
 Отримати інформацію із плану
     [Arguments]  ${username}  ${tender_uaid}  ${field_name}
+    Відкрити детальну інформацію по плану
+
     Run Keyword And Return If  '${field_name}' == 'tender.procurementMethodType'  Отримати тип запланованого тендера  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'budget.amount'  Convert Amount To Number  ${tender_data_value.amount}
     Run Keyword And Return If  '${field_name}' == 'budget.currency'  Отримати інформацію з value.currency  value.currency
@@ -1081,6 +1083,25 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
     ${result}=  Strip String  ${result_full}
     [Return]  ${result}
 
+
+
+
+Відкрити детальну інформацію по плану
+  Wait Until Element Is Visible  xpath=//a[contains(@ng-click, 'itemShowTab')]
+
+  ${count}=  Get Matching Xpath Count  .//section//a[contains(@class, 'nav-item ng-binding checked')]
+  Run Keyword if  ${count} == 0  Click Element  xpath=//a[contains(@ng-click, 'itemShowTab')]
+
+  Wait Until Element Is Visible  xpath=//a[contains(@ng-class, 'checked-item')]
+  ${count}=  Get Matching Xpath Count  xpath=//section//a[@class="ng-binding"]
+
+  Run Keyword if  ${count} != 0  Відкрити itemObject  ${count}
+
+Відкрити itemObject
+  [Arguments]  ${count}
+  @{list}=  Get Webelements  xpath=//section//a[@class="ng-binding"]
+  :FOR  ${i}  IN  @{list}
+     \  Click Element  ${i}
 
 Отримати інформацію про постачальника
     [Arguments]  ${tender_uaid}  ${field_name}
@@ -1642,7 +1663,7 @@ Try To Search Complaint
     ${temp_name}=  Remove String  ${element_name}  '
 
     ${element}=  Set Variable If
-        ...  'css=' in '${temp_name}' or 'xpath=' in '${temp_name}'  ${element_name}
+        ...  'css=' in '${temp_name}' or 'xpath=' in '${temp_name}' or 'id=' in '${temp_name}'  ${element_name}
         ...  ${tender_data_${element_name}}
 
     Wait Until Element Is Visible  ${element}  ${COMMONWAIT}
