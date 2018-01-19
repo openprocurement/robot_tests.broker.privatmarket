@@ -714,10 +714,11 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
     [Arguments]  ${user_name}  ${filepath}  ${tenderId}
     #перейдем к редактированию
     Run Keyword If
-    ...  'Неможливість' in '${TEST_NAME}'  Wait Until Element Is Visible  ${locator_tenderClaim.buttonCreate}
+    ...  'Неможливість' in '${TEST_NAME}'  Wait Until Element Is Visible  ${locator_tenderClaim.buttonCreate}  1s
     ...  ELSE  Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
 
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
+    Sleep  2s
     Wait Until Element Is Visible  css=input[data-id='procurementName']  ${COMMONWAIT}
     Wait Until Keyword Succeeds  1min  10s  Звiрити value of title на сторінці редагуванння  ${user_name}
     #откроем нужную вкладку
@@ -752,6 +753,7 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
     ...  ELSE  Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
 
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
+    Sleep  2s
     Wait Until Element Is Visible  css=input[data-id='procurementName']  ${COMMONWAIT}
     Wait Until Keyword Succeeds  1min  10s  Звiрити value of title на сторінці редагуванння  ${user_name}
     Wait Visibility And Click Element  css=#tab_3 a
@@ -761,7 +763,7 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
     Wait Visibility And Click Element  xpath=//div[@data-id='lot']//select[@data-id='filetype']//option[2]
     Sleep  1s
     Wait Visibility And Click Element  xpath=//div[@data-id='lot']//select[@data-id='filelang']//option[@value='string:en']
-
+    Sleep  1s
     Run Keyword And Ignore Error  Execute Javascript  document.querySelector("div[data-id='lot'] input[type='file']").style = ''
     Sleep  1s
     Choose File  css=div[data-id='lot'] input[type='file']  ${filePath}
@@ -779,9 +781,9 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
 
 Завантажити документ у кваліфікацію
     [Arguments]  ${user_name}  ${filepath}  ${tenderId}  ${bid_index}
-    Wait Until Element Is Visible  xpath=//li[contains(@ng-class, 'lot-parts')]
-    ${class}=  Get Element Attribute  xpath=//li[contains(@ng-class, 'lot-parts')]@class
-    Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
+    Wait Until Element Is Visible  xpath=//a[contains(@ng-class, 'lot-parts')]
+    ${class}=  Get Element Attribute  xpath=//a[contains(@ng-class, 'lot-parts')]@class
+    Run Keyword Unless  'checked' in '${class}'  Click Element  xpath=//a[contains(@ng-class, 'lot-parts')]
 
     ${index}=  privatmarket_service.sum_of_numbers  ${bid_index}  1
     Run Keyword If
@@ -792,13 +794,15 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
     Sleep  1s
     Wait Visibility And Click Element  xpath=//div[@class='files-upload']//select[@class='form-block__select ng-scope form-block__select_short']//option[2]
     Sleep  1s
+    Run Keyword And Ignore Error  Execute Javascript  document.querySelector(".files-upload input[type='file']").class = ''
+    Sleep  1s
     Choose File  xpath=//div[@class='files-upload']//input[@type='file']  ${filePath}
     Sleep  5s
 
 
 Підтвердити кваліфікацію
     [Arguments]  ${user_name}  ${tenderId}  ${bid_index}
-    Wait Visibility And Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
+    Wait Visibility And Click Element  xpath=//a[contains(@ng-class, 'lot-parts')]
     Run Keyword If  ${bid_index} < 0  privatmarket_service.positivate_numbers  ${bid_index}
     ${index}=  privatmarket_service.sum_of_numbers  ${bid_index}  1
     Wait Visibility And Click Element  xpath=(//a[@ng-click='act.openQualification(q)'])[${index}]
@@ -820,7 +824,7 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
     Reload Page
     Wait For Element With Reload  xpath=//span[@data-id="status" and contains(text(), 'Очікує ЕЦП')]  1
 
-    Wait Visibility And Click Element  xpath=(//a[@ng-click='act.openQualification(q)'])[${index}]
+    Wait Visibility And Click Element  xpath=(//a[@ng-click='act.openQualification(q)'])[${bid_index}]
     Wait For Ajax
     Wait Visibility And Click Element  xpath=//button[@data-id='addQualFileEcp']
     Select Window  name=signWin
@@ -1293,12 +1297,12 @@ Try To Search Complaint
 
 Отримати статус пропозиції кваліфікації
     [Arguments]  ${item}
-    Wait Until Element Is Visible  xpath=//li[contains(@ng-class, 'lot-parts')]
-    ${class}=  Get Element Attribute  xpath=//li[contains(@ng-class, 'lot-parts')]@class
-    Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
+    Wait Until Element Is Visible  xpath=//a[contains(@ng-class, 'lot-parts')]
+    ${class}=  Get Element Attribute  xpath=//a[contains(@ng-class, 'lot-parts')]@class
+    Run Keyword Unless  'checked' in '${class}'  Click Element  xpath=//a[contains(@ng-class, 'lot-parts')]
     Wait Until Element Is Visible  css=.bids>tbody>tr:nth-of-type(${item})>td:nth-of-type(3)  timeout=${COMMONWAIT}
 
-    ${elem_text}=  Get Text  css=.bids>tbody>tr:nth-of-type(${item})>td:nth-of-type(3)
+    ${elem_text}=  Get Text  xpath=(//span[@data-id='status'])[${item}]
     ${status_text}=  Split String  ${elem_text}  \n
     ${status}=  Strip String  ${status_text[0]}
     ${result}=  privatmarket_service.get_status_type  ${status}
@@ -1358,8 +1362,6 @@ Try To Search Complaint
     Wait Visibility And Click Element  id=btnSendAnswer
     Wait For Notification  Ваша відповідь успішно відправлена!
     Wait Visibility And Click Element  css=span[ng-click='act.hideModal()']
-    Wait Until Element Is Not Visible  id=questionAnswer  timeout=20
-    #этот слип нужен, т.к. нет синхронизации и квинта ищет ответ в следующем тесте... а его нет пока не синхранизируемся
     Sleep  90s
 
 
@@ -1373,8 +1375,6 @@ Try To Search Complaint
     Wait Visibility And Click Element  id=btnSendAnswer
     Wait For Notification  Ваша відповідь успішно відправлена!
     Wait Visibility And Click Element  id=btnClose
-    Wait Until Element Is Not Visible  id=questionAnswer  timeout=20
-    #этот слип нужен, т.к. нет синхронизации и квинта ищет ответ в следующем тесте... а его нет пока не синхранизируемся
     Sleep  90s
 
 
