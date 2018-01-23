@@ -669,8 +669,8 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
     Wait Visibility And Click Element  css=#tab_2 a
     Sleep  3
     Wait Visibility And Click Element  xpath=//div[@data-id='item']//button[contains(., 'Додати показник')]
-    Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@ng-model='feature.title'])[last()]  ${feature.title}
-    Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//textarea[@ng-model='feature.description'])[last()]  ${feature.description}
+    Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@data-id='title'])[last()]  ${feature.title}
+    Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//textarea[@data-id='description'])[last()]  ${feature.description}
 
     @{item_enums}=  Get From Dictionary  ${feature}  enum
     ${item_criterion_count}=  Get Length  ${item_enums}
@@ -680,8 +680,8 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
     \  ${item_criterion_value}=  privatmarket_service.get_percent  ${item_enums[${index}].value}
     \  ${item_criterion_value}=  Convert to String   ${item_criterion_value}
     \  ${elem_index}=  privatmarket_service.sum_of_numbers  ${index}  1
-    \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@ng-model='criterion.value'])[last()]  ${item_criterion_value}
-    \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@ng-model='criterion.title'])[last()]  ${item_enums[${index}].title}
+    \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@data-id='criterionValue'])[last()]  ${item_criterion_value}
+    \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@data-id='criterionTitle'])[last()]  ${item_enums[${index}].title}
 
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait For Ajax
