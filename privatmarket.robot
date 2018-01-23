@@ -23,7 +23,7 @@ ${locator_tenderAdd.btnSave}  css=button[data-id='actSave']
 ${locator_tenderCreation.buttonSend}  css=button[data-id='actSend']
 ${locator_tenderClaim.buttonCreate}  css=button[data-id='editProcBtn']
 
-${tender_data_title}  css=.title-div [data-id='tender-full-title']
+${tender_data_title}  css=.title-div [data-id='tender-title-token']
 ${tender_data_description}  css=#tenderDescription
 ${tender_data_procurementMethodType}  css=#tenderType
 ${tender_data_status}  css=#tenderStatus
