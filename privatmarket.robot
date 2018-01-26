@@ -724,13 +724,13 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
 
     #загрузим файл
     Wait Visibility And Click Element  css=label[for='documentation_tender_yes']
-    Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//section[@data-id='ptrDocuments']//select[@data-id='filetype']//option[2]
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//div[@data-id='ptrDocuments']//select[@data-id='filetype']//option[2]
     Sleep  1s
-    Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//section[@data-id='ptrDocuments']//select[@data-id='filelang']//option[@value='string:en']
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//div[@data-id='ptrDocuments']//select[@data-id='filelang']//option[@value='string:en']
     Sleep  1s
-    Run Keyword And Ignore Error  Execute Javascript  document.querySelector("section[data-id='ptrDocuments'] input[type='file']").style = ''
+    Run Keyword And Ignore Error  Execute Javascript  document.querySelector("div[data-id='ptrDocuments'] input[data-id='input-file']").style = ''
     Sleep  1s
-    Run Keyword And Ignore Error  Choose File  css=section[data-id='ptrDocuments'] input[type='file']  ${filePath}
+    Run Keyword And Ignore Error  Choose File  css=div[data-id='ptrDocuments'] input[data-id='input-file']  ${filePath}
     Sleep  5s
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait For Ajax
@@ -757,13 +757,13 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
     Sleep  2s
     Wait Visibility And Click Element  css=label[for='documentation_lot_yes']
     Sleep  1s
-    Wait Visibility And Click Element  xpath=//div[@data-id='lot']//select[@data-id='filetype']//option[2]
+    Wait Visibility And Click Element  xpath=//div[@data-id='lotDocuments']//select[@data-id='filetype']//option[2]
     Sleep  1s
-    Wait Visibility And Click Element  xpath=//div[@data-id='lot']//select[@data-id='filelang']//option[@value='string:en']
+    Wait Visibility And Click Element  xpath=//div[@data-id='lotDocuments']//select[@data-id='filelang']//option[@value='string:en']
     Sleep  1s
-    Run Keyword And Ignore Error  Execute Javascript  document.querySelector("div[data-id='lot'] input[type='file']").style = ''
+    Run Keyword And Ignore Error  Execute Javascript  document.querySelector("div[data-id='lotDocuments'] input[data-id='input-file']").style = ''
     Sleep  1s
-    Choose File  css=div[data-id='lot'] input[type='file']  ${filePath}
+    Choose File  css=div[data-id='lotDocuments'] input[data-id='input-file']  ${filePath}
     Sleep  5s
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait For Ajax
