@@ -175,9 +175,7 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
     Call Method  ${chrome_options}  add_argument  --nativeEvents\=false
     Call Method  ${chrome_options}  add_experimental_option  prefs  ${prefs}
     #Для Viewer'а нужен хром, т.к. на хром настроена автоматическая закачка файлов
-    Run Keyword If  '${username}' == 'PrivatMarket_Viewer'  Create WebDriver  Chrome  chrome_options=${chrome_options}  alias=${username}
-    Run Keyword If  '${username}' == 'PrivatMarket_Owner'  Create WebDriver  Chrome  chrome_options=${chrome_options}  alias=${username}
-    Run Keyword If  '${username}' == 'PrivatMarket_Provider'  Create WebDriver  Chrome  chrome_options=${chrome_options}  alias=${username}
+    Create WebDriver  Chrome  chrome_options=${chrome_options}  alias=${username}
     Go To  ${USERS.users['${username}'].homepage}
 
     #Open Browser  ${USERS.users['${username}'].homepage}  ${browser}  alias=${username}
@@ -2045,12 +2043,17 @@ Get Item Number
 
 
 Задати запитання на лот
-	[Arguments]  ${username}  ${tender_uaid}  ${lot_id}  ${question}
-	Wait Until Element Is Visible  xpath=//li[contains(@ng-class, 'lot-parts')]
-    ${class}=  Get Element Attribute  xpath=//li[contains(@ng-class, 'lot-parts')]@class
-	Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=//a[contains(@ng-class, 'lot-faq')]
-	Wait Visibility And Click Element  xpath=//button[@class='btn btn-primary ng-scope ng-binding']
-	Wait Element Visibility And Input Text  css=#questionTitle  ${question.data.title}
+    [Arguments]  ${username}  ${tender_uaid}  ${lot_id}  ${question}
+    Wait Until Element Is Visible  xpath=//a[contains(@ng-class, 'lot-faq')]
+    ${class}=  Get Element Attribute  xpath=//a[contains(@ng-class, 'lot-faq')]@class
+    Run Keyword Unless  'checked' in '${class}'  Click Element  xpath=//a[contains(@ng-class, 'lot-faq')]
+    Wait Visibility And Click Element  xpath=//button[@class='btn btn-primary ng-scope ng-binding']
+    Заповнити форму запитання  ${question}
+
+
+Заповнити форму запитання
+    [Arguments]  ${question}
+    Wait Element Visibility And Input Text  css=#questionTitle  ${question.data.title}
     Wait Element Visibility And Input Text  css=#questionDescription  ${question.data.description}
     Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//select[@id='addressCountry']//option[@value='UA']
     Wait Element Visibility And Input Text  css=#addressPostalCode  ${question.data.author.address.postalCode}
@@ -2074,24 +2077,41 @@ Get Item Number
     [Arguments]  ${username}  ${tender_uaid}  ${bid}  ${lots_ids}=${None}  ${features_ids}=${None}
     Wait Visibility And Click Element  xpath=//button[@data-id="createBidBtn"]
     ${value_amount}=  privatmarket_service.convert_float_to_string  ${bid.data.lotValues[0].value.amount}
-    Wait Element Visibility And Input Text  xpath=//div[@ng-if="!model.nocost"]//div[2]//input  ${value_amount}
-    Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
-    Run Keyword And Ignore Error  Wait Visibility And Click Element  id=btnSaveComplaint
-    Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
-    Run Keyword And Ignore Error  Wait Visibility And Click Element  id=btnSaveComplaint
-    Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
-    Wait Visibility And Click Element  id=chkSelfQualified
-    Wait Visibility And Click Element  id=chkSelfEligible
-    Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
-    Run Keyword And Ignore Error  Wait Visibility And Click Element  id=btnClose
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  css=button[data-id='modal-close']
+    Sleep  2s
+    Wait Element Visibility And Input Text  css=input[data-id='lot-user-price']  ${value_amount}
+    Click Button  css=button[data-id='save-bid-btn']
+    Wait For Ajax
+    Wait Until Element Is Visible  css=select[data-id='filetype']
+    Click Button  css=button[data-id='save-bid-btn']
+    Wait For Ajax
+    Wait Element Visibility And Input Text  css=input[data-id='postalCode']  ${bid.data.tenderers[0].address.postalCode}
+    Wait Element Visibility And Input Text  css=input[data-id='countryName']  ${bid.data.tenderers[0].address.countryName}
+    Wait Element Visibility And Input Text  css=input[data-id='region']  ${bid.data.tenderers[0].address.region}
+    Wait Element Visibility And Input Text  css=input[data-id='locality']  ${bid.data.tenderers[0].address.locality}
+    Wait Element Visibility And Input Text  css=input[data-id='streetAddress']  ${bid.data.tenderers[0].address.streetAddress}
+    ${modified_phone}=  Remove String  ${bid.data.tenderers[0].contactPoint.telephone}  ${SPACE}
+    ${modified_phone}=  Remove String  ${modified_phone}  -
+    ${modified_phone}=  Remove String  ${modified_phone}  (
+    ${modified_phone}=  Remove String  ${modified_phone}  )
+    ${modified_phone}=  Set Variable If  '+38' in '${modified_phone}'  ${modified_phone}  +38067${modified_phone}
+    ${modified_phone}=  Get Substring  ${modified_phone}  0  13
+    Wait Element Visibility And Input Text  css=input[data-id='fullNameUa']  ${bid.data.tenderers[0].contactPoint.name}
+    Wait Element Visibility And Input Text  css=input[data-id='phone']  ${modified_phone}
+    Wait Element Visibility And Input Text  css=input[data-id='email']  ${bid.data.tenderers[0].contactPoint.email}
+    Click Button  css=button[data-id='save-bid-btn']
+    Wait For Ajax
+    Wait Visibility And Click Element  css=button[data-id='save-bid-btn']
+    Sleep  1s
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  css=button[data-id='modal-close']
     Sleep  60s
 
 
 Отримати інформацію із пропозиції
     [Arguments]  ${username}  ${tender_uaid}  ${field}
-    Wait Until Element Is Visible  xpath=//li[contains(@ng-class, 'lot-parts')]
-    ${class}=  Get Element Attribute  xpath=//li[contains(@ng-class, 'lot-parts')]@class
-	Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
+    Wait Until Element Is Visible  xpath=//a[contains(@ng-class, 'lot-parts')]
+    ${class}=  Get Element Attribute  xpath=//a[contains(@ng-class, 'lot-parts')]@class
+    Run Keyword Unless  'checked' in '${class}'  Click Element  xpath=//a[contains(@ng-class, 'lot-parts')]
 
     Run Keyword And Return If  '${field}' == 'lotValues[0].value.amount'  Отримати інформацію з пропозиції ${field}
     Run Keyword And Return If  '${field}' == 'value.amount'  Отримати інформацію з пропозиції ${field}
@@ -2123,38 +2143,84 @@ Get Item Number
 Завантажити документ в ставку
     [Arguments]  ${username}  ${filePath}  ${tenderId}  ${doc_type}=documents
     Wait Visibility And Click Element  xpath=//button[@data-id="editBidBtn"]
-    Wait Visibility And Click Element  xpath=//select[@data-id='choseType']//option[2]
-    Wait Visibility And Click Element  xpath=//select[@data-id='choseLang']//option[2]
-    Choose File  xpath=//input[@id='inputFile0']  ${filePath}
+    Sleep  2s
+    Click Button  css=button[data-id='save-bid-btn']
+    Wait For Ajax
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//file-uploader[@data-id='common-documents']//select[@data-id='filetype']//option[2]
+    Sleep  1s
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//file-uploader[@data-id='common-documents']//select[@data-id='filelang']//option[@value='string:en']
+    Sleep  1s
+    Run Keyword And Ignore Error  Execute Javascript  document.querySelector("file-uploader[data-id='common-documents'] input[data-id='input-file']").style = ''
+    Sleep  1s
+    Run Keyword And Ignore Error  Choose File  css=file-uploader[data-id='common-documents'] input[data-id='input-file']  ${filePath}
     Sleep  5s
-    Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
-    Run Keyword And Ignore Error  Wait Visibility And Click Element  id=btnSaveComplaint
-    Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
-    Run Keyword And Ignore Error  Wait Visibility And Click Element  id=btnSaveComplaint
-    Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
-    Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
-    Run Keyword And Ignore Error  Wait Visibility And Click Element  id=btnClose
-    Sleep  15s
+    Click Button  css=button[data-id='save-bid-btn']
+    Wait For Ajax
+    Click Button  css=button[data-id='save-bid-btn']
+    Wait For Ajax
+    Wait Visibility And Click Element  css=button[data-id='save-bid-btn']
+    Sleep  1s
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  css=button[data-id='modal-close']
+    Sleep  60s
+
+
+Змінити документ в ставці
+    [Arguments]  ${username}  ${tender_uaid}  ${path}  ${doc_id}  ${doc_type}=documents
+    Wait Visibility And Click Element  xpath=//button[@data-id="editBidBtn"]
+    Sleep  2s
+    Wait Visibility And Click Element  css=button[data-id='save-bid-btn']
+    Wait For Ajax
+    Run Keyword And Ignore Error  Execute Javascript  var s = angular.element($('[data-id=common-documents]').get(0)).scope(); s.$ctrl.changedDoc=s.$ctrl.docs[0];
+    Sleep  1s
+    Run Keyword And Ignore Error  Execute Javascript  document.querySelector("file-uploader[data-id='common-documents'] input[data-id='input-file']").style = ''
+    Sleep  1s
+    Run Keyword And Ignore Error  Choose File  css=file-uploader[data-id='common-documents'] input[data-id='input-single-file']  ${filePath}
+    Sleep  5s
+    Click Button  css=button[data-id='save-bid-btn']
+    Wait For Ajax
+    Click Button  css=button[data-id='save-bid-btn']
+    Wait For Ajax
+    Wait Visibility And Click Element  css=button[data-id='save-bid-btn']
+    Sleep  1s
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  css=button[data-id='modal-close']
+    Sleep  60s
+
 
 Змінити цінову пропозицію
     [Arguments]  ${username}  ${tender_uaid}  ${field}  ${value}
     Wait Visibility And Click Element  xpath=//button[@data-id="editBidBtn"]
-    Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
-    Run Keyword And Ignore Error  Wait Visibility And Click Element  id=btnSaveComplaint
-    Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
-    Run Keyword And Ignore Error  Wait Visibility And Click Element  id=btnSaveComplaint
-    Wait Element Visibility And Input Text  xpath=//div[@ng-if="!model.nocost"]//div[2]  ${value}
-    Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
-    Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
-    Run Keyword And Ignore Error  Wait Visibility And Click Element  id=btnClose
-    Sleep  15s
+    Sleep  2s
+    ${value}=  privatmarket_service.convert_float_to_string  ${value}
+    Wait Element Visibility And Input Text  css=input[data-id='lot-user-price']  ${value}
+    Click Button  css=button[data-id='save-bid-btn']
+    Wait For Ajax
+    Wait Until Element Is Visible  css=select[data-id='filetype']
+    Click Button  css=button[data-id='save-bid-btn']
+    Wait For Ajax
+    Click Button  css=button[data-id='save-bid-btn']
+    Wait For Ajax
+    Wait Visibility And Click Element  css=button[data-id='save-bid-btn']
+    Sleep  1s
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  css=button[data-id='modal-close']
+    Sleep  60s
+
+
+Отримати посилання на аукціон для учасника
+    [Arguments]  ${username}  ${tender_uaid}
+    Wait For Element With Reload  xpath=//a[contains(@href, 'https://auction-sandbox.openprocurement.org/tenders/')]  1  30
+    ${result}=  Get Element Attribute  xpath=//a[contains(@href, 'https://auction-sandbox.openprocurement.org/tenders/')]@href
+    [Return]  ${result}
+
 
 Задати запитання на тендер
     [Arguments]  ${username}  ${tender_uaid}  ${question}
-    privatmarket.Задати запитання на лот  ${username}  ${tender_uaid}  ${lot_id}=${None}  ${question}
+    Switch To Tab  2
+    Wait Visibility And Click Element  css=#info-tab .btn.btn-primary
+    Заповнити форму запитання  ${question}
+
 
 Задати запитання на предмет
-	[Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${question}
+    [Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${question}
     privatmarket.Задати запитання на лот  ${username}  ${tender_uaid}  ${lot_id}=${item_id}  ${question}
 
 
