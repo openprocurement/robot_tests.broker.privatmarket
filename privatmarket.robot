@@ -1093,11 +1093,13 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
 
   Run Keyword if  ${count} != 0  Відкрити itemObject  ${count}
 
+
 Відкрити itemObject
   [Arguments]  ${count}
   @{list}=  Get Webelements  xpath=//section//a[@class="ng-binding"]
   :FOR  ${i}  IN  @{list}
      \  Click Element  ${i}
+
 
 Отримати інформацію про постачальника
     [Arguments]  ${tender_uaid}  ${field_name}
@@ -1123,7 +1125,6 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
     ...  'запитання на тендер' in '${TEST_NAME}'  xpath=(//div[contains(@class, 'faq') and contains(., '${question_id}')]${tender_data_question.${field_name}}
     ...  'запитання на всі лоти' in '${TEST_NAME}'  xpath=//div[contains(@class, 'lot-info') and contains(., '${question_id}')]${tender_data_lot_question.${field_name}}
     ...  'запитання на всі предмети' in '${TEST_NAME}'  xpath=//div[contains(@class, 'lot-info') and contains(., '${question_id}')]${tender_data_lot_question.${field_name}}
-
 
     Run Keyword If
     ...  'запитання на тендер' in '${TEST_NAME}'  Wait For Element With Reload  ${element}  2
@@ -2041,7 +2042,6 @@ Get Item Number
     Wait Visibility And Click Element  xpath=//button[@data-id="btn-close"]
 
 
-
 Задати запитання на лот
     [Arguments]  ${username}  ${tender_uaid}  ${lot_id}  ${question}
     Wait Until Element Is Visible  xpath=//a[contains(@ng-class, 'lot-faq')]
@@ -2203,6 +2203,13 @@ Get Item Number
     Sleep  1s
     Run Keyword And Ignore Error  Wait Visibility And Click Element  css=button[data-id='modal-close']
     Sleep  60s
+
+
+Скасувати цінову пропозицію
+    [Arguments]  ${username}  ${tender_uaid}
+    Wait Visibility And Click Element  xpath=//button[@data-id="editBidBtn"]
+    Sleep  2s
+    Wait Visibility And Click Element  css=button[data-id='delete-bid-btn']
 
 
 Отримати посилання на аукціон для учасника
