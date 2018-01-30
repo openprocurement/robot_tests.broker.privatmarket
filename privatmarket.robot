@@ -846,6 +846,8 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
 
 Отримати інформацію із тендера
     [Arguments]  ${user_name}  ${tender_uaid}  ${field_name}
+    ${status}=  Run Keyword And Return Status  Wait Until Element Is Visible  ${tender_data_title}  5s
+    Run Keyword If  '${status}' == 'False'  privatmarket.Пошук тендера по ідентифікатору  ${user_name}  ${tender_uaid}
     Reload And Switch To Tab  1
     Wait Until Element Is Visible  ${tender_data_title}  ${COMMONWAIT}
 
@@ -854,7 +856,7 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
     #get information
     ${result}=  Run Keyword If
     ...  'award_view' in @{TEST_TAGS} or 'add_contract' in @{TEST_TAGS}  Отримати інформацію про постачальника  ${tender_uaid}  ${field_name}
-    ...  ELSE  Отримати інформацію зі сторінки  ${tender_uaid}  ${field_name}
+    ...  ELSE  Отримати інформацію зі сторінки  ${user_name}  ${tender_uaid}  ${field_name}
     [Return]  ${result}
 
 
@@ -960,7 +962,7 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
 
 
 Отримати інформацію зі сторінки
-    [Arguments]  ${base_tender_uaid}  ${field_name}
+    [Arguments]  ${user_name}  ${base_tender_uaid}  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'value.amount'  Convert Amount To Number  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'value.currency'  Отримати інформацію з ${field_name}  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'value.valueAddedTaxIncluded'  Отримати інформацію з ${field_name}  ${field_name}
@@ -969,7 +971,7 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
     Run Keyword And Return If  '${field_name}' == 'tenderPeriod.startDate'  Отримати дату та час  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'tenderPeriod.endDate'  Отримати дату та час  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'minimalStep.amount'  Convert Amount To Number  ${field_name}
-    Run Keyword And Return If  '${field_name}' == 'status'  Отримати інформацію з ${field_name}  ${field_name}
+    Run Keyword And Return If  '${field_name}' == 'status'  Отримати інформацію з ${field_name}  ${user_name}  ${base_tender_uaid}  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'qualificationPeriod.endDate'  Отримати дату та час  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'qualifications[0].status'  Отримати статус пропозиції кваліфікації  1
     Run Keyword And Return If  '${field_name}' == 'qualifications[1].status'  Отримати статус пропозиції кваліфікації  2
@@ -1515,7 +1517,7 @@ Try To Search Complaint
 
 
 Отримати інформацію з status
-    [Arguments]  ${element_name}
+    [Arguments]  ${user_name}  ${tender_uaid}  ${element_name}
     privatmarket.Оновити сторінку з тендером
     Wait Until Element Is Visible  ${tender_data_${element_name}}  ${COMMONWAIT}
     Sleep  5s
@@ -1967,11 +1969,10 @@ Get Item Number
 
 Відповісти на вимогу про виправлення умов закупівлі
     [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${answer_data}
-    Wait Until Keyword Succeeds  5min  10s  Wait For Element With Reload  xpath=//div[@id='nav-tab']//span[@class='ng-scope ng-binding']  3
-    Wait Until Keyword Succeeds  15min  10s  Wait For Element With Reload  xpath=//div[contains(@class,'faq ng-scope') and contains(.,'${complaintID}')]//button[@class='btn btn-success ng-scope ng-binding']  3
-    Wait Visibility And Click Element  xpath=//div[contains(@class,'faq ng-scope') and contains(.,'${complaintID}')]//button[@class='btn btn-success ng-scope ng-binding']
-    Wait Visibility And Click Element  xpath=//select[@id='resolutionType']/option[@value='${answer_data.data.resolutionType}']
-    Wait Element Visibility And Input Text  xpath=//textarea[@class='ng-pristine ng-valid']  ${answer_data.data.resolution}
+    Wait Until Keyword Succeeds  15min  10s  Wait For Element With Reload  xpath=//div[contains(@class,'faq') and contains(.,'${complaintID}')]//button  3
+    Wait Visibility And Click Element  xpath=//div[contains(@class,'faq') and contains(.,'${complaintID}')]//button
+    Wait Visibility And Click Element  xpath=//select[@id='resolutionType']/option[@value='string:${answer_data.data.resolutionType}']
+    Wait Element Visibility And Input Text  xpath=//textarea[@ng-model='model.userResolution']  ${answer_data.data.resolution}
     Wait Visibility And Click Element  xpath=//button[@data-id='btn-send-complaint-resolution']
     Sleep  120s
 
@@ -1983,19 +1984,21 @@ Get Item Number
 
 Завантажити документ рішення кваліфікаційної комісії
     [Arguments]  ${username}  ${document}  ${tender_uaid}  ${award_num}
-    Wait Until Element Is Visible  xpath=//li[contains(@ng-class, 'lot-parts')]
+    Wait Until Element Is Visible  xpath=//a[contains(@ng-class, 'lot-parts')]
     Wait Until Keyword Succeeds  10min  10s  Дочекатися можливості завантажити документ рішення кваліфікаційної комісії
     Wait Visibility And Click Element  xpath=//div[@class='files-upload']//select[@class='form-block__select form-block__select_short']//option[2]
     Sleep  1s
     Wait Visibility And Click Element  xpath=//div[@class='files-upload']//select[@class='form-block__select ng-scope form-block__select_short']//option[3]
     Sleep  1s
-    Choose File  xpath=//div[@class='files-upload']//input[@type='file']  ${document}
+    Execute Javascript  document.querySelector(".files-upload input[type='file']").class = ''
+    Sleep  1s
+    Choose File  css=.files-upload input[type='file']  ${document}
     Sleep  5s
 
 
 Дочекатися можливості завантажити документ рішення кваліфікаційної комісії
     Reload Page
-    Wait Visibility And Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
+    Wait Visibility And Click Element  xpath=//a[contains(@ng-class, 'lot-parts')]
     Wait Visibility And Click Element  xpath=//div[@class='lot-info ng-scope' and contains(.,'Кваліфікація учасників') ]//table[@class='bids']//a[@class='ng-binding']
 
 
@@ -2006,9 +2009,9 @@ Get Item Number
 
 Підтвердити постачальника
     [Arguments]  ${username}  ${tender_uaid}  ${award_num}
-    Wait Until Element Is Visible  xpath=//li[contains(@ng-class, 'lot-parts')]
-    ${class}=  Get Element Attribute  xpath=//li[contains(@ng-class, 'lot-parts')]@class
-    Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
+    Wait Until Element Is Visible  xpath=//a[contains(@ng-class, 'lot-parts')]
+    ${class}=  Get Element Attribute  xpath=//a[contains(@ng-class, 'lot-parts')]@class
+    Run Keyword Unless  'checked' in '${class}'  Click Element  xpath=//a[contains(@ng-class, 'lot-parts')]
     Wait Visibility And Click Element  xpath=//div[@class='award-section award-actions ng-scope']//button[@data-id='setActive']
     Sleep  180s
 
@@ -2047,7 +2050,7 @@ Get Item Number
     Wait Until Element Is Visible  xpath=//a[contains(@ng-class, 'lot-faq')]
     ${class}=  Get Element Attribute  xpath=//a[contains(@ng-class, 'lot-faq')]@class
     Run Keyword Unless  'checked' in '${class}'  Click Element  xpath=//a[contains(@ng-class, 'lot-faq')]
-    Wait Visibility And Click Element  xpath=//button[@class='btn btn-primary ng-scope ng-binding']
+    Wait Visibility And Click Element  css=.faq>.btn
     Заповнити форму запитання  ${question}
 
 
@@ -2070,7 +2073,7 @@ Get Item Number
     Wait Visibility And Click Element  xpath=//button[@data-id="btn-send-question"]
     Sleep  5s
     Wait Visibility And Click Element  xpath=//button[@data-id="btn-close"]
-    Sleep  60s
+    Sleep  90s
 
 
 Подати цінову пропозицію
@@ -2079,12 +2082,14 @@ Get Item Number
     ${value_amount}=  privatmarket_service.convert_float_to_string  ${bid.data.lotValues[0].value.amount}
     Run Keyword And Ignore Error  Wait Visibility And Click Element  css=button[data-id='modal-close']
     Sleep  2s
-    Wait Element Visibility And Input Text  css=input[data-id='lot-user-price']  ${value_amount}
+    Run Keyword Unless  'Неможливість' in '${TEST_NAME}'  Wait Element Visibility And Input Text  css=input[data-id='lot-user-price']  ${value_amount}
     Click Button  css=button[data-id='save-bid-btn']
     Wait For Ajax
     Wait Until Element Is Visible  css=select[data-id='filetype']
     Click Button  css=button[data-id='save-bid-btn']
     Wait For Ajax
+    Wait Visibility And Click Element  css=div[ng-click='act.toggleQualified()']
+    Wait Visibility And Click Element  css=div[ng-click='act.toggleEligible()']
     Wait Element Visibility And Input Text  css=input[data-id='postalCode']  ${bid.data.tenderers[0].address.postalCode}
     Wait Element Visibility And Input Text  css=input[data-id='countryName']  ${bid.data.tenderers[0].address.countryName}
     Wait Element Visibility And Input Text  css=input[data-id='region']  ${bid.data.tenderers[0].address.region}
@@ -2186,6 +2191,16 @@ Get Item Number
     Sleep  60s
 
 
+Змінити документацію в ставці
+    [Arguments]  ${username}  ${tender_uaid}  ${doc_data}  ${doc_id}
+    Wait Visibility And Click Element  xpath=//button[@data-id="editBidBtn"]
+    Sleep  2s
+    Wait Visibility And Click Element  css=button[data-id='save-bid-btn']
+    Wait For Ajax
+    debug
+    Sleep  1s
+
+
 Змінити цінову пропозицію
     [Arguments]  ${username}  ${tender_uaid}  ${field}  ${value}
     Wait Visibility And Click Element  xpath=//button[@data-id="editBidBtn"]
@@ -2222,7 +2237,7 @@ Get Item Number
 Задати запитання на тендер
     [Arguments]  ${username}  ${tender_uaid}  ${question}
     Switch To Tab  2
-    Wait Visibility And Click Element  css=#info-tab .btn.btn-primary
+    Wait Visibility And Click Element  css=button[data-id='ask-ptr']
     Заповнити форму запитання  ${question}
 
 
