@@ -333,12 +333,7 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
     Wait Element Visibility And Input Text  css=[data-id='contactPoint'] input[data-id='fullNameUa']  ${tender_data.data.procuringEntity.contactPoint.name}
     Run Keyword IF  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='contactPoint'] input[data-id='fullNameEn']  ${tender_data.data.procuringEntity.contactPoint.name_en}
 
-    ${modified_phone}=  Remove String  ${tender_data.data.procuringEntity.contactPoint.telephone}  ${SPACE}
-    ${modified_phone}=  Remove String  ${modified_phone}  -
-    ${modified_phone}=  Remove String  ${modified_phone}  (
-    ${modified_phone}=  Remove String  ${modified_phone}  )
-    ${modified_phone}=  Set Variable If  '+38' in '${modified_phone}'  ${modified_phone}  +38067${modified_phone}
-    ${modified_phone}=  Get Substring  ${modified_phone}  0  13
+    ${modified_phone}=  Привести номер телефону до відповідного формату  ${tender_data.data.procuringEntity.contactPoint.telephone}
     Wait Element Visibility And Input Text  css=input[data-id='phone']  ${modified_phone}
     Wait Element Visibility And Input Text  css=input[data-id='email']  ${USERS.users['${username}'].email}
     Wait Element Visibility And Input Text  css=input[data-id='url']  ${tender_data.data.procuringEntity.contactPoint.url}
@@ -1971,10 +1966,10 @@ Get Item Number
 
 Відповісти на вимогу про виправлення умов закупівлі
     [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${answer_data}
-    Wait Until Keyword Succeeds  15min  10s  Wait For Element With Reload  xpath=//div[contains(@class,'faq') and contains(.,'${complaintID}')]//button  3
+    Wait Until Keyword Succeeds  15min  10s  Wait For Element With Reload  xpath=//div[contains(@class,'faq') and contains(.,'${complaintID}')]//button[@data-id='resolution-button']  3
     Wait Visibility And Click Element  xpath=//div[contains(@class,'faq') and contains(.,'${complaintID}')]//button
     Wait Visibility And Click Element  xpath=//select[@id='resolutionType']/option[@value='string:${answer_data.data.resolutionType}']
-    Wait Element Visibility And Input Text  xpath=//textarea[@ng-model='model.userResolution']  ${answer_data.data.resolution}
+    Wait Element Visibility And Input Text  css=textarea[data-id='user-resolution']  ${answer_data.data.resolution}
     Wait Visibility And Click Element  xpath=//button[@data-id='btn-send-complaint-resolution']
     Sleep  120s
 
@@ -2026,6 +2021,7 @@ Get Item Number
 
 Створити вимогу про виправлення умов закупівлі
     [Arguments]  ${username}  ${tender_uaid}  ${claim}  ${document}=${None}
+    Reload And Switch To Tab  1
     Wait Visibility And Click Element  xpath=//a[@tooltip='Подати вимогу на даний лот']
     Wait Element Visibility And Input Text  css=#titleComplaint  ${claim.data.title}
     Wait Element Visibility And Input Text  css=#descriptionComplaint  ${claim.data.description}
@@ -2039,12 +2035,39 @@ Get Item Number
     Wait Element Visibility And Input Text  css=#personSurname  @{contactPoint}[0]
     Wait Element Visibility And Input Text  css=#personName  @{contactPoint}[1]
     Wait Element Visibility And Input Text  css=#personPatronymic  @{contactPoint}[2]
-    Wait Element Visibility And Input Text  css=#personPhone  ${claim.data.author.contactPoint.telephone}
-    Wait Element Visibility And Input Text  css=#personFax  ${claim.data.author.contactPoint.faxNumber}
+    ${telephone}=  Привести номер телефону до відповідного формату  ${claim.data.author.contactPoint.telephone}
+    Wait Element Visibility And Input Text  css=#personPhone  ${telephone}
+    ${faxNumber}=  Привести номер телефону до відповідного формату  ${claim.data.author.contactPoint.faxNumber}
+    Wait Element Visibility And Input Text  css=#personFax  ${faxNumber}
     Wait Element Visibility And Input Text  css=#personEmail  ${claim.data.author.contactPoint.email}
     Wait Visibility And Click Element  xpath=//button[@data-id="btn-send-complaint"]
-    Sleep  5s
+    Sleep  7s
     Wait Visibility And Click Element  xpath=//button[@data-id="btn-close"]
+    Reload And Switch To Tab  3
+    ${result}=  Get Text  xpath=(//span[@data-id='complaint-id'])[1]
+    [Return]  ${result}
+
+
+Підтвердити вирішення вимоги про виправлення умов закупівлі
+    [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${confirmation_data}
+    Reload And Switch To Tab  3
+    ${confirmation}=  Set Variable  ${confirmation_data.data.satisfied}
+    Run Keyword If  '${confirmation}' == 'True'  Wait Visibility And Click Element  xpath=//span[contains(@data-id, 'complaint-id') and contains(., '${complaintID}')]/../../..//button[@data-id='complaint-satisfied']
+    ...  ELSE  Wait Visibility And Click Element  xpath=//span[contains(@data-id, 'complaint-id') and contains(., '${complaintID}')]/../../..//button[@data-id='complaint-not-satisfied']
+    Sleep  1s
+    Wait Visibility And Click Element  css=button[data-id='btn-ok']
+    Sleep  180s
+
+
+Привести номер телефону до відповідного формату
+    [Arguments]  ${phone}
+    ${modified_phone}=  Remove String  ${phone}  ${SPACE}
+    ${modified_phone}=  Remove String  ${modified_phone}  -
+    ${modified_phone}=  Remove String  ${modified_phone}  (
+    ${modified_phone}=  Remove String  ${modified_phone}  )
+    ${modified_phone}=  Set Variable If  '+38' in '${modified_phone}'  ${modified_phone}  +38067${modified_phone}
+    ${modified_phone}=  Get Substring  ${modified_phone}  0  13
+    [Return]  ${modified_phone}
 
 
 Задати запитання на лот
@@ -2052,7 +2075,7 @@ Get Item Number
     Wait Until Element Is Visible  xpath=//a[contains(@ng-class, 'lot-faq')]
     ${class}=  Get Element Attribute  xpath=//a[contains(@ng-class, 'lot-faq')]@class
     Run Keyword Unless  'checked' in '${class}'  Click Element  xpath=//a[contains(@ng-class, 'lot-faq')]
-    Wait Visibility And Click Element  css=.faq>.btn
+    Wait Visibility And Click Element  css=button[data-id='lot-question']
     Заповнити форму запитання  ${question}
 
 
@@ -2090,19 +2113,17 @@ Get Item Number
     Wait Until Element Is Visible  css=select[data-id='filetype']
     Click Button  css=button[data-id='save-bid-btn']
     Wait For Ajax
-    Wait Visibility And Click Element  css=div[ng-click='act.toggleQualified()']
-    Wait Visibility And Click Element  css=div[ng-click='act.toggleEligible()']
+
+    ${scenarios_name}=  privatmarket_service.get_scenarios_name
+    Run Keyword Unless  'single_item' in '${scenarios_name}' or 'below' in '${scenarios_name}'  Wait Visibility And Click Element  css=label[data-id='toggle-qualified']
+    Run Keyword Unless  'single_item' in '${scenarios_name}' or 'below' in '${scenarios_name}'  Wait Visibility And Click Element  css=label[data-id='toggle-eligible']
+
     Wait Element Visibility And Input Text  css=input[data-id='postalCode']  ${bid.data.tenderers[0].address.postalCode}
     Wait Element Visibility And Input Text  css=input[data-id='countryName']  ${bid.data.tenderers[0].address.countryName}
     Wait Element Visibility And Input Text  css=input[data-id='region']  ${bid.data.tenderers[0].address.region}
     Wait Element Visibility And Input Text  css=input[data-id='locality']  ${bid.data.tenderers[0].address.locality}
     Wait Element Visibility And Input Text  css=input[data-id='streetAddress']  ${bid.data.tenderers[0].address.streetAddress}
-    ${modified_phone}=  Remove String  ${bid.data.tenderers[0].contactPoint.telephone}  ${SPACE}
-    ${modified_phone}=  Remove String  ${modified_phone}  -
-    ${modified_phone}=  Remove String  ${modified_phone}  (
-    ${modified_phone}=  Remove String  ${modified_phone}  )
-    ${modified_phone}=  Set Variable If  '+38' in '${modified_phone}'  ${modified_phone}  +38067${modified_phone}
-    ${modified_phone}=  Get Substring  ${modified_phone}  0  13
+    ${modified_phone}=  Привести номер телефону до відповідного формату  ${bid.data.tenderers[0].contactPoint.telephone}
     Wait Element Visibility And Input Text  css=input[data-id='fullNameUa']  ${bid.data.tenderers[0].contactPoint.name}
     Wait Element Visibility And Input Text  css=input[data-id='phone']  ${modified_phone}
     Wait Element Visibility And Input Text  css=input[data-id='email']  ${bid.data.tenderers[0].contactPoint.email}
