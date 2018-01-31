@@ -5,15 +5,19 @@ from munch import munchify as privatmarket_munchify
 from selenium.common.exceptions import StaleElementReferenceException
 from datetime import datetime, timedelta
 from pytz import timezone
+import re
+import datetime
+import dateutil.parser
 
 
 def modify_test_data(initial_data):
     #set user name
     # initial_data['procuringEntity']['name'] = u'Товариство З Обмеженою Відповідальністю \'Мак Медіа Прінт\''
     initial_data['procuringEntity']['name'] = u'Сф Рубіжне'
-    initial_data['procuringEntity']['contactPoint']['telephone'] = u'+380670444580'
-    initial_data['procuringEntity']['contactPoint']['url'] = u'https://dadadad.com'
-    initial_data['procuringEntity']['identifier']['legalName'] = u'ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ \'СІЛЬСЬКОГОСПОДАРСЬКА ФІРМА \'РУБІЖНЕ\''
+    if 'contactPoint' in initial_data['procuringEntity']:
+        initial_data['procuringEntity']['contactPoint']['telephone'] = u'+380670444580'
+        initial_data['procuringEntity']['contactPoint']['url'] = u'https://dadadad.com'
+    initial_data['procuringEntity']['identifier']['legalName'] = u'ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ \'СІЛЬСЬКОГОСПОДАРСЬКА ФІРМА \'Сф РУБІЖНЕ\''
     initial_data['procuringEntity']['identifier']['id'] = u'38580144'
     # initial_data['procuringEntity']['name'] = u'Макстрой Діск, Товариство З Обмеженою Відповідальністю'
     # initial_data['procuringEntity']['name'] = u'ФОП ОГАНІН ОЛЕКСАНДР ПЕТРОВИЧ'
@@ -46,10 +50,16 @@ def get_month_number(month_name):
 
 
 def get_time_with_offset(date):
-    date_obj = datetime.strptime(date, "%Y-%m-%d %H:%M")
+    date_obj = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M")
     time_zone = timezone('Europe/Kiev')
     localized_date = time_zone.localize(date_obj)
     return localized_date.strftime('%Y-%m-%d %H:%M:%S.%f%z')
+
+def get_time_with_offset_formatted(date, input_format_date, output_format):
+    date_obj = datetime.strptime(date, input_format_date)
+    time_zone = timezone('Europe/Kiev')
+    localized_date = time_zone.localize(date_obj)
+    return localized_date.strftime(output_format)
 
 
 def get_current_date():
@@ -253,10 +263,21 @@ def get_abs_item_index(lot_index, item_index, items_count):
     return abs_index
 
 
+def get_match_from_string(string, pattern, group):
+    result = 'null';
+    p = re.compile(pattern)
+    m = p.search(string)
+
+    if p.search(string):
+        return m.group(int(group))
+    return result
+
 def get_percent(value):
     value = value * 100
     return format(value, '.0f')
 
+def get_conversion_to_int(value):
+    return int(float(value))
 
 def get_cause(cause_text):
     cause_dictionary = {
@@ -282,8 +303,14 @@ def get_items_from_lot(items, lot_id):
             lot_items.append(item)
     return lot_items
 
+
 def get_ECP_key():
     return os.path.join(os.getcwd(), 'src/robot_tests.broker.privatmarket/Key-6.dat')
+
+
+def get_date_formatting(date,format_day):
+    return dateutil.parser.parse(date).date().strftime(format_day)
+
 
 def get_scenarios_name():
     name = ''
