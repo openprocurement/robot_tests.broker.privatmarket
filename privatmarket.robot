@@ -262,6 +262,8 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
     Wait Until Element Is Visible  ${locator_tenderSearch.searchInput}  ${COMMONWAIT}
     Check Current Mode New Realisation
 
+    ${scenarios_name}=  privatmarket_service.get_scenarios_name
+
 #go to form
     Wait For Ajax
     Wait Visibility And Click Element  ${locator_tenderSearch.addTender}
@@ -287,9 +289,9 @@ ${tender_data_lots[0].auctionPeriod.endDate}  css=#active.auction-ed
     Wait For Ajax
     Run Keyword If
     ...  ${type} == 'negotiation'  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']/option[contains(., '1080')]
-    ...  ELSE IF  ${type} == ''  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']/option[contains(., '240')]
+    ...  ELSE IF  ${type} == '' and 'award_complaint' in '${scenarios_name}'  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']/option[contains(., '240')]
+    ...  ELSE IF  ${type} == ''  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']/option[contains(., '1440')]
     ...  ELSE  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']/option[contains(., '1440')]
-
 
 #step 0
     #we should add choosing of procurementMethodType

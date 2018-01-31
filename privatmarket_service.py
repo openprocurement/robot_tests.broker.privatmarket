@@ -1,5 +1,6 @@
 # coding=utf-8
 import os
+import sys
 from munch import munchify as privatmarket_munchify
 from selenium.common.exceptions import StaleElementReferenceException
 from datetime import datetime, timedelta
@@ -283,3 +284,10 @@ def get_items_from_lot(items, lot_id):
 
 def get_ECP_key():
     return os.path.join(os.getcwd(), 'src/robot_tests.broker.privatmarket/Key-6.dat')
+
+def get_scenarios_name():
+    name = ''
+    for param in sys.argv:
+        if 'txt' in param:
+            name = param
+    return name
