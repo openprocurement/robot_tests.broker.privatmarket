@@ -2338,6 +2338,16 @@ Get Item Number
     [Return]  ${result}
 
 
+Створити вимогу про виправлення визначення переможця
+    [Arguments]  ${username}  ${tender_uaid}  ${claim}  ${award_index}  ${document}=${None}
+    debug
+    Sleep  1
+
+
+
+
+
+
 Скасувати вимогу про виправлення умов лоту
     [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${cancellation_data}
     Reload And Switch To Tab  3
@@ -2413,7 +2423,7 @@ Get Item Number
     [Arguments]  ${username}  ${tender_uaid}  ${bid}  ${lots_ids}=${None}  ${features_ids}=${None}
     Wait Visibility And Click Element  xpath=//button[@data-id="createBidBtn"]
     ${value_amount}=  privatmarket_service.convert_float_to_string  ${bid.data.lotValues[0].value.amount}
-    Run Keyword And Ignore Error  Wait Visibility And Click Element  css=button[data-id='modal-close']
+
     Sleep  2s
     Run Keyword Unless  'Неможливість' in '${TEST_NAME}'  Wait Element Visibility And Input Text  css=input[data-id='lot-user-price']  ${value_amount}
     Click Button  css=button[data-id='save-bid-btn']
