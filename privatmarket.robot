@@ -729,7 +729,7 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
     Wait Until Element Is Visible  css=input[data-id='procurementName']  ${COMMONWAIT}
     Wait Until Keyword Succeeds  1min  10s  Звiрити value of title на сторінці редагуванння  ${user_name}
-    Run Keyword If  '${parameter}' == 'tenderPeriod'  Set Date  tenderPeriod  endDate  ${value}
+    Run Keyword If  '${parameter}' == 'tenderPeriod.endDate'  Set Date  tenderPeriod  endDate  ${value}
     Run Keyword If  '${parameter}' == 'description'  Wait Element Visibility And Input Text  css=textarea[data-id='procurementDescription']  ${value}
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait Until Element Is Visible  css=section[data-id='step2']  ${COMMONWAIT}
@@ -964,6 +964,7 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
     ${index}=  privatmarket_service.sum_of_numbers  ${bid_index}  1
     Wait Visibility And Click Element  xpath=(//a[@ng-click='act.openQualification(q)'])[${index}]
     Wait For Ajax
+    debug
     Wait Visibility And Click Element  css=#chkSelfQualified
     Wait Visibility And Click Element  css=#chkSelfEligible
     Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//select[@data-id='choseType']//option[2]
@@ -2518,11 +2519,13 @@ Get Item Number
 
 Отримати інформацію з пропозиції status
     ${value}=  Отримати текст елемента  xpath=//tr[contains(@ng-repeat, 'currBids[lot.id] ')]//td[4]
-    [Return]  ${result}
+    ${value}=  Set Variable If  '${value}' == 'Недійсна'  invalid  ${value}
+    [Return]  ${value}
 
 
 Завантажити документ в ставку
     [Arguments]  ${username}  ${filePath}  ${tenderId}  ${doc_type}=documents
+    privatmarket.Пошук тендера по ідентифікатору  ${username}  ${tenderId}
     Wait Visibility And Click Element  xpath=//button[@data-id="editBidBtn"]
     Sleep  2s
     Click Button  css=button[data-id='save-bid-btn']
@@ -2538,11 +2541,11 @@ Get Item Number
     Click Button  css=button[data-id='save-bid-btn']
     Wait For Ajax
     Click Button  css=button[data-id='save-bid-btn']
-    Wait For Ajax
+    Sleep  10s
     Wait Visibility And Click Element  css=button[data-id='save-bid-btn']
     Sleep  1s
     Run Keyword And Ignore Error  Wait Visibility And Click Element  css=button[data-id='modal-close']
-    Sleep  60s
+    Sleep  90s
 
 
 Змінити документ в ставці
@@ -2578,10 +2581,11 @@ Get Item Number
 
 Змінити цінову пропозицію
     [Arguments]  ${username}  ${tender_uaid}  ${field}  ${value}
-    Wait Visibility And Click Element  xpath=//button[@data-id="editBidBtn"]
+    Run Keyword If  '${field}' == 'status'  Wait Visibility And Click Element  xpath=//button[@data-id="createBidBtn"]
+    ...  ELSE  Wait Visibility And Click Element  xpath=//button[@data-id="editBidBtn"]
     Sleep  2s
     ${value}=  privatmarket_service.convert_float_to_string  ${value}
-    Wait Element Visibility And Input Text  css=input[data-id='lot-user-price']  ${value}
+    Run Keyword If  'value.amount' in '${field}'  Wait Element Visibility And Input Text  css=input[data-id='lot-user-price']  ${value}
     Click Button  css=button[data-id='save-bid-btn']
     Wait For Ajax
     Wait Until Element Is Visible  css=select[data-id='filetype']

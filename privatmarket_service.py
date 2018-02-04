@@ -222,7 +222,12 @@ def get_status_type(status_name):
 
 
 def convert_float_to_string(number):
-    return format(number, '.2f')
+    result = number
+    if type(number) is float:
+        return format(number, '.2f')
+    else:
+        return result
+
 
 
 def get_claim_status (status):
