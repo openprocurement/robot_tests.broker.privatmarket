@@ -2291,6 +2291,7 @@ Get Item Number
     Wait Visibility And Click Element  css=#btnSendClaim
     Wait Element Visibility And Input Text  css=#titleComplaint  ${claim.data.title}
     Wait Element Visibility And Input Text  css=#descriptionComplaint  ${claim.data.description}
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//select[@id='addressCountry']//option[@value='UA']
     Wait Element Visibility And Input Text  css=#addressPostalCode  ${claim.data.author.address.postalCode}
     Wait Element Visibility And Input Text  css=#addressRegion  ${claim.data.author.address.countryName}
     Wait Element Visibility And Input Text  css=#addressLocality  ${claim.data.author.address.locality}
