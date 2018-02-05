@@ -964,7 +964,6 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
     ${index}=  privatmarket_service.sum_of_numbers  ${bid_index}  1
     Wait Visibility And Click Element  xpath=(//a[@ng-click='act.openQualification(q)'])[${index}]
     Wait For Ajax
-    debug
     Wait Visibility And Click Element  css=#chkSelfQualified
     Wait Visibility And Click Element  css=#chkSelfEligible
     Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//select[@data-id='choseType']//option[2]
@@ -2286,6 +2285,33 @@ Get Item Number
     [Return]  ${result}
 
 
+Створити чернетку вимоги про виправлення умов закупівлі
+    [Arguments]  ${username}  ${tender_uaid}  ${claim}
+    Switch To Tab  3
+    Wait Visibility And Click Element  css=#btnSendClaim
+    Wait Element Visibility And Input Text  css=#titleComplaint  ${claim.data.title}
+    Wait Element Visibility And Input Text  css=#descriptionComplaint  ${claim.data.description}
+    Wait Element Visibility And Input Text  css=#addressPostalCode  ${claim.data.author.address.postalCode}
+    Wait Element Visibility And Input Text  css=#addressRegion  ${claim.data.author.address.countryName}
+    Wait Element Visibility And Input Text  css=#addressLocality  ${claim.data.author.address.locality}
+    Wait Element Visibility And Input Text  css=#addressStreet  ${claim.data.author.address.streetAddress}
+    @{contactPoint} =  Split String  ${claim.data.author.contactPoint.name}
+    Wait Element Visibility And Input Text  css=#personSurname  @{contactPoint}[0]
+    Wait Element Visibility And Input Text  css=#personName  @{contactPoint}[1]
+    Wait Element Visibility And Input Text  css=#personPatronymic  @{contactPoint}[2]
+    ${telephone}=  Привести номер телефону до відповідного формату  ${claim.data.author.contactPoint.telephone}
+    Wait Element Visibility And Input Text  css=#personPhone  ${telephone}
+    ${faxNumber}=  Привести номер телефону до відповідного формату  ${claim.data.author.contactPoint.faxNumber}
+    Wait Element Visibility And Input Text  css=#personFax  ${faxNumber}
+    Wait Element Visibility And Input Text  css=#personEmail  ${claim.data.author.contactPoint.email}
+    Wait Visibility And Click Element  xpath=//button[@data-id="btn-send-complaint"]
+    Sleep  10s
+    Wait Visibility And Click Element  xpath=//button[@data-id="btn-close"]
+    Reload And Switch To Tab  3
+    ${result}=  Get Text  xpath=(//span[@data-id='complaint-id'])[1]
+    [Return]  ${result}
+
+
 Створити вимогу про виправлення умов лоту
     [Arguments]  ${username}  ${tender_uaid}  ${claim}  ${lot_id}  ${document}=${None}
     Switch To Tab  1
@@ -2374,12 +2400,10 @@ Get Item Number
     ${faxNumber}=  Привести номер телефону до відповідного формату  ${claim.data.author.contactPoint.faxNumber}
     Wait Element Visibility And Input Text  css=#personFax  ${faxNumber}
     Wait Element Visibility And Input Text  css=#personEmail  ${claim.data.author.contactPoint.email}
-    debug
     Wait Visibility And Click Element  xpath=//button[@data-id="btn-send-complaint"]
     Sleep  10s
     Wait Visibility And Click Element  xpath=//button[@data-id="btn-close"]
     Reload And Switch To Tab  3
-    debug
     ${result}=  Get Text  xpath=(//span[@data-id='complaint-id'])[1]
     [Return]  ${result}
 
@@ -2388,7 +2412,6 @@ Get Item Number
     [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${cancellation_data}
     Reload And Switch To Tab  3
     Wait Visibility And Click Element  xpath=//span[contains(@data-id, 'complaint-id') and contains(., '${complaintID}')]/../../..//a[@ng-click='act.showCancelComplaintWnd(q)']
-    debug
 
 
 Підтвердити вирішення вимоги про виправлення умов закупівлі
