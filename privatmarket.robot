@@ -2387,7 +2387,9 @@ Get Item Number
     Sleep  1
     Wait Element Visibility And Input Text  css=#titleComplaint  ${claim.data.title}
     Wait Element Visibility And Input Text  css=#descriptionComplaint  ${claim.data.description}
+    debug
     Run Keyword And Ignore Error  Choose File  css=input[id='fileToUpload']  ${document}
+    debug
     Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//select[@id='addressCountry']//option[@value='UA']
     Wait Element Visibility And Input Text  css=#addressPostalCode  ${claim.data.author.address.postalCode}
     Wait Element Visibility And Input Text  css=#addressRegion  ${claim.data.author.address.countryName}
@@ -2408,6 +2410,46 @@ Get Item Number
     Reload And Switch To Tab  3
     ${result}=  Get Text  xpath=(//span[@data-id='complaint-id'])[1]
     [Return]  ${result}
+
+
+Створити чернетку вимоги про виправлення визначення переможця
+    [Arguments]  ${username}  ${tender_uaid}  ${claim}  ${award_index}
+    Reload And Switch To Tab  1
+    Wait Until Element Is Visible  xpath=//a[contains(@ng-class, 'lot-parts')]
+    ${class}=  Get Element Attribute  xpath=//a[contains(@ng-class, 'lot-parts')]@class
+    Run Keyword Unless  'checked' in '${class}'  Click Element  xpath=//a[contains(@ng-class, 'lot-parts')]
+    Sleep  1
+    Wait Visibility And Click Element  css=a[ng-click="act.showChooseCmplWnd(b.id, 'award', lot.id)"]
+    Sleep  1
+    Wait Visibility And Click Element  css=button[data-id='btn-send-claim']
+    Sleep  1
+    Wait Element Visibility And Input Text  css=#titleComplaint  ${claim.data.title}
+    Wait Element Visibility And Input Text  css=#descriptionComplaint  ${claim.data.description}
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//select[@id='addressCountry']//option[@value='UA']
+    Wait Element Visibility And Input Text  css=#addressPostalCode  ${claim.data.author.address.postalCode}
+    Wait Element Visibility And Input Text  css=#addressRegion  ${claim.data.author.address.countryName}
+    Wait Element Visibility And Input Text  css=#addressLocality  ${claim.data.author.address.locality}
+    Wait Element Visibility And Input Text  css=#addressStreet  ${claim.data.author.address.streetAddress}
+    @{contactPoint} =  Split String  ${claim.data.author.contactPoint.name}
+    Wait Element Visibility And Input Text  css=#personSurname  @{contactPoint}[0]
+    Wait Element Visibility And Input Text  css=#personName  @{contactPoint}[1]
+    Wait Element Visibility And Input Text  css=#personPatronymic  @{contactPoint}[2]
+    ${telephone}=  Привести номер телефону до відповідного формату  ${claim.data.author.contactPoint.telephone}
+    Wait Element Visibility And Input Text  css=#personPhone  ${telephone}
+    ${faxNumber}=  Привести номер телефону до відповідного формату  ${claim.data.author.contactPoint.faxNumber}
+    Wait Element Visibility And Input Text  css=#personFax  ${faxNumber}
+    Wait Element Visibility And Input Text  css=#personEmail  ${claim.data.author.contactPoint.email}
+    Wait Visibility And Click Element  xpath=//button[@data-id="btn-send-complaint"]
+    Sleep  10s
+    Wait Visibility And Click Element  xpath=//button[@data-id="btn-close"]
+    Reload And Switch To Tab  3
+    ${result}=  Get Text  xpath=(//span[@data-id='complaint-id'])[1]
+    [Return]  ${result}
+
+
+
+
+
 
 
 Скасувати вимогу про виправлення умов лоту
@@ -2505,7 +2547,8 @@ Get Item Number
 
 Подати цінову пропозицію
     [Arguments]  ${username}  ${tender_uaid}  ${bid}  ${lots_ids}=${None}  ${features_ids}=${None}
-    Wait Visibility And Click Element  xpath=//button[@data-id="createBidBtn"]
+    Wait For Element With Reload  xpath=//button[@data-id='createBidBtn']  1
+    Click Element  xpath=//button[@data-id='createBidBtn']
     ${value_amount}=  privatmarket_service.convert_float_to_string  ${bid.data.lotValues[0].value.amount}
 
     Sleep  2s
