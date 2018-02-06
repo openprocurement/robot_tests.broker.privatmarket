@@ -2448,9 +2448,13 @@ Get Item Number
     [Return]  ${result}
 
 
-
-
-
+Скасувати вимогу про виправлення визначення переможця
+    [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${cancellation_data}  ${award_index}
+    Reload And Switch To Tab  3
+    Wait Visibility And Click Element  xpath=//span[contains(@data-id, 'complaint-id') and contains(., '${complaintID}')]/../../..//a[@data-id='cancel-claim-action']
+    Sleep  1s
+    Wait Element Visibility And Input Text  css=#reasonCancelComplaint  ${cancellation_data.data.cancellationReason}
+    Wait Visibility And Click Element  css=button[data-id='btn-cancel-complaint']
 
 
 Скасувати вимогу про виправлення умов лоту
