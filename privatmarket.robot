@@ -2100,6 +2100,7 @@ Switch To Tab
     ${class}=  Get Element Attribute  xpath=(//div[@id='nav-tab']/a)[${tab_number}]@class
     Execute JavaScript  window.scrollTo(${0},${0})
     Run Keyword Unless  'checked' in '${class}'  Wait Visibility And Click Element  xpath=(//div[@id='nav-tab']/a)[${tab_number}]
+    Sleep  1s
 
 
 Search By Query
@@ -2440,6 +2441,17 @@ Get Item Number
 
 Підтвердити вирішення вимоги про виправлення умов лоту
     [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${confirmation_data}
+    Reload And Switch To Tab  3
+    ${confirmation}=  Set Variable  ${confirmation_data.data.satisfied}
+    Run Keyword If  '${confirmation}' == 'True'  Wait Visibility And Click Element  xpath=//span[contains(@data-id, 'complaint-id') and contains(., '${complaintID}')]/../../..//button[@data-id='complaint-satisfied']
+    ...  ELSE  Wait Visibility And Click Element  xpath=//span[contains(@data-id, 'complaint-id') and contains(., '${complaintID}')]/../../..//button[@data-id='complaint-not-satisfied']
+    Sleep  1s
+    Wait Visibility And Click Element  css=button[data-id='btn-ok']
+    Sleep  180s
+
+
+Підтвердити вирішення вимоги про виправлення визначення переможця
+    [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${confirmation_data}  ${award_index}
     Reload And Switch To Tab  3
     ${confirmation}=  Set Variable  ${confirmation_data.data.satisfied}
     Run Keyword If  '${confirmation}' == 'True'  Wait Visibility And Click Element  xpath=//span[contains(@data-id, 'complaint-id') and contains(., '${complaintID}')]/../../..//button[@data-id='complaint-satisfied']
