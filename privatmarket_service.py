@@ -89,7 +89,7 @@ def get_unit_code(name):
         u'упаковка': u'PK',
         u'гектар': u'HAR',
         u'блок': u'D64',
-        u'флакон': u'VI'
+        u'Флакон': u'VI'
     }
     expected_name = dictionary.get(name)
     if expected_name:
@@ -263,6 +263,10 @@ def positivate_numbers(number):
     number = int(number) * -1
     return number
 
+def abs_number(number):
+    return  abs(int(number))
+
+
 def get_abs_item_index(lot_index, item_index, items_count):
     abs_index = ((int(lot_index)-1) * int(items_count)) + item_index
     return abs_index
@@ -313,6 +317,10 @@ def get_ECP_key():
     return os.path.join(os.getcwd(), 'src/robot_tests.broker.privatmarket/Key-6.dat')
 
 
+def get_ECP_key2(path):
+    return os.path.join(os.getcwd(), path)
+
+
 def get_date_formatting(date,format_day):
     return dateutil.parser.parse(date).date().strftime(format_day)
 
@@ -323,3 +331,10 @@ def get_scenarios_name():
         if 'txt' in param:
             name = param
     return name
+
+
+def is_click_button(lot_index, item_index):
+    status = 'true'
+    if int(item_index) == 1 and int(lot_index) == 1:
+        return 'false'
+    return status
