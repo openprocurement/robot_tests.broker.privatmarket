@@ -2388,9 +2388,7 @@ Get Item Number
     Sleep  1
     Wait Element Visibility And Input Text  css=#titleComplaint  ${claim.data.title}
     Wait Element Visibility And Input Text  css=#descriptionComplaint  ${claim.data.description}
-    debug
     Run Keyword And Ignore Error  Choose File  css=input[id='fileToUpload']  ${document}
-    debug
     Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//select[@id='addressCountry']//option[@value='UA']
     Wait Element Visibility And Input Text  css=#addressPostalCode  ${claim.data.author.address.postalCode}
     Wait Element Visibility And Input Text  css=#addressRegion  ${claim.data.author.address.countryName}
@@ -2415,6 +2413,7 @@ Get Item Number
 
 Створити чернетку вимоги про виправлення визначення переможця
     [Arguments]  ${username}  ${tender_uaid}  ${claim}  ${award_index}
+    Wait until keyword succeeds  5min  10s  Звірити статус  ${username}  ${tender_uaid}
     Reload And Switch To Tab  1
     Wait Until Element Is Visible  xpath=//a[contains(@ng-class, 'lot-parts')]
     ${class}=  Get Element Attribute  xpath=//a[contains(@ng-class, 'lot-parts')]@class
