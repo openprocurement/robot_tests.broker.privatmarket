@@ -587,6 +587,16 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
     ...  ELSE  privatmarket_service.get_unit_name  ${items[${index}].unit.name}
 
     Wait Visibility And Click Element  xpath=(((//div[@data-id='lot'])[${lot_index}]//div[@data-id='item'])//select[@data-id='unit'])[${item_index}]/option[text()='${unitName}']
+
+    #CPV
+    Wait Visibility And Click Element  xpath=((//div[@data-id='lot'])[${lot_index}]//div[@data-id='item'])[${item_index}]//a[@data-id='actChoose']
+    Wait Until Element Is Visible  css=section[data-id='classificationTreeModal']  ${COMMONWAIT}
+    Wait Until Element Is Visible  css=input[data-id='query']  ${COMMONWAIT}
+    Search By Query  css=input[data-id='query']  ${items[${index}].classification.id}
+    Wait Visibility And Click Element  css=button[data-id='actConfirm']
+
+
+
     ${classification_id}=  Get Substring  ${items[${index}].classification.id}  0  5
     ${pre_classification_id}=  Get Substring  ${items[${index}].classification.id}  0  3
     ${classification_status}=  Set Variable If  '${pre_classification_id}' == '33695'  ${False}  ${True}
