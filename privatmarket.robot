@@ -2099,6 +2099,7 @@ Try Search Element
 Reload And Switch To Tab
     [Arguments]  ${tab_number}
     Reload Page
+    Sleep  5s
     Switch To Tab  ${tab_number}
 
 
