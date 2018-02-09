@@ -1856,18 +1856,8 @@ Try To Search Complaint
     ${class}=  Get Element Attribute  xpath=(//a[contains(@ng-class, 'lot-parts')])[1]@class
     Run Keyword Unless  'checked' in '${class}'  Click Element  xpath=(//a[contains(@ng-class, 'lot-parts')])[1]
     ${title}=  Get Element Attribute  xpath=//a[contains(., 'Переможець')]@title
-    ${work_string}=  Get Regexp Matches  ${title}  до (.)*
-    ${work_string}=  Get From List  ${work_string}  0
-    ${work_string}=  Replace String  ${work_string}  ,${SPACE}  ${SPACE}
-    ${values_list}=  Split String  ${work_string}
-    ${day}=  Convert To Integer  ${values_list[0 + ${shift}]}
-    ${day}=  Set Variable If  ${day} < 10  0${day}  ${day}
-    ${month}=  privatmarket_service.get_month_number  ${values_list[1 + ${shift}]}
-    ${month}=  Set Variable If  ${month} < 10  0${month}  ${month}
-    ${year}=  Convert To String  ${values_list[2 + ${shift}]}
-    ${time}=  Convert To String  ${values_list[3 + ${shift}]}
-    ${date}=  Convert To String  ${year}-${month}-${day} ${time}
-    ${result}=  privatmarket_service.get_time_with_offset  ${date}
+    ${date}=  privatmarket_service.get_match_from_string  ${title}  до (.+)  1
+    ${result}=  privatmarket_service.get_time_with_offset_formatted  ${date}  %d.%m.%Y %H:%M  %Y-%m-%d %H:%M:%S.%f%z
     [Return]  ${result}
 
 
