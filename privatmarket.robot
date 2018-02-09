@@ -1919,8 +1919,8 @@ Try To Search Complaint
 
     ${result_full}=  Отримати текст елемента  ${element_name}
     ${work_string}=  Replace String  ${result_full}  ${SPACE},${SPACE}  ${SPACE}
-    ${work_string}=  Replace String  ${result_full}  ,${SPACE}  ${SPACE}
-    ${work_string}=  Replace String  ${result_full}  .  ${SPACE}
+    ${work_string}=  Replace String  ${work_string}  ,${SPACE}  ${SPACE}
+    ${work_string}=  Replace String  ${work_string}  .  ${SPACE}
     ${values_list}=  Split String  ${work_string}
     ${day}=  Convert To String  ${values_list[0]}
     ${month}=  privatmarket_service.get_month_number  ${values_list[1]}
