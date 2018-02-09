@@ -1220,7 +1220,7 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
     ${element}=  Set Variable  xpath=(//div[@class='lot-info']/section[contains(., '${object_id}')]${tender_data_item.${field_name}}
 
     Run Keyword And Return If  '${field_name}' == 'deliveryDate.startDate'  Отримати дату та час  ${element}
-    Run Keyword And Return If  '${field_name}' == 'deliveryDate.endDate'  Отримати дату та час  ${element}
+    Run Keyword And Return If  '${field_name}' == 'deliveryDate.endDate'  Отримати інформацію з deliveryDate  ${element}
     Run Keyword And Return If  '${field_name}' == 'deliveryLocation.latitude'  Отримати число  ${element}  0
     Run Keyword And Return If  '${field_name}' == 'deliveryLocation.longitude'  Отримати число  ${element}  0
     Run Keyword And Return If  '${field_name}' == 'additionalClassifications[0].scheme'  Отримати інформацію з ${field_name}  ${element}
@@ -1919,6 +1919,16 @@ Try To Search Complaint
     ${time}=  Convert To String  ${values_list[3]}
     ${date}=  Convert To String  ${year}-${month}-${day} ${time}
     ${result}=  privatmarket_service.get_time_with_offset  ${date}
+    [Return]  ${result}
+
+
+Отримати інформацію з deliveryDate
+    [Arguments]  ${element_name}
+    ${element_present}=  Run Keyword And Return Status  Element Should Be Visible  ${element_name}
+    Run Keyword unless  ${element_present}  Wait For Element With Reload  ${tender_data_${element_name}}  1
+
+    ${date}=  Отримати текст елемента  ${element_name}
+    ${result}=  privatmarket_service.get_time_with_offset_formatted  ${date}  %d.%m.%Y %H:%M  %Y-%m-%d %H:%M
     [Return]  ${result}
 
 
