@@ -2672,8 +2672,19 @@ Get Item Number
     Sleep  2s
     Wait Visibility And Click Element  css=button[data-id='save-bid-btn']
     Wait For Ajax
-    debug
+    Wait Visibility And Click Element  css=label[data-id="confidentiality-toggle"]
+    Wait Element Visibility And Input Text  css=textarea[data-if="confidentiality-rationale-text"]  ${doc_data.data.confidentialityRationale}
     Sleep  1s
+    Wait Visibility And Click Element  css=button[data-id="save-confidentiality"]
+    Sleep  10s
+    Wait Visibility And Click Element  css=button[data-id='save-bid-btn']
+    Wait For Ajax
+    Wait Visibility And Click Element  css=button[data-id='save-bid-btn']
+    Wait For Ajax
+    Wait Visibility And Click Element  css=button[data-id='save-bid-btn']
+    Sleep  1s
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  css=button[data-id='modal-close']
+    Sleep  60s
 
 
 Змінити цінову пропозицію
@@ -2686,9 +2697,9 @@ Get Item Number
     Click Button  css=button[data-id='save-bid-btn']
     Wait For Ajax
     Wait Until Element Is Visible  css=select[data-id='filetype']
-    Click Button  css=button[data-id='save-bid-btn']
+    Wait Visibility And Click Element  css=button[data-id='save-bid-btn']
     Wait For Ajax
-    Click Button  css=button[data-id='save-bid-btn']
+    Wait Visibility And Click Element  css=button[data-id='save-bid-btn']
     Wait For Ajax
     Wait Visibility And Click Element  css=button[data-id='save-bid-btn']
     Sleep  1s
