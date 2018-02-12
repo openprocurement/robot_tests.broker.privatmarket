@@ -1,9 +1,6 @@
-# coding=utf-8
 import os
 import sys
-from munch import munchify as privatmarket_munchify
-from selenium.common.exceptions import StaleElementReferenceException
-from datetime import datetime, timedelta
+from datetime import datetime
 from pytz import timezone
 import re
 import datetime
@@ -54,6 +51,7 @@ def get_time_with_offset(date):
     time_zone = timezone('Europe/Kiev')
     localized_date = time_zone.localize(date_obj)
     return localized_date.strftime('%Y-%m-%d %H:%M:%S.%f%z')
+
 
 def get_time_with_offset_formatted(date, input_format_date, output_format):
     date_obj = datetime.datetime.strptime(date, input_format_date)
@@ -229,7 +227,6 @@ def convert_float_to_string(number):
         return result
 
 
-
 def get_claim_status (status):
     type_dictionary = {
         u'Вiдправлено': 'claim',
@@ -243,6 +240,7 @@ def get_claim_status (status):
     }
     type_name = type_dictionary.get(status)
     return type_name
+
 
 def get_procurementMethod_Type (type):
     type_dictionary = {
@@ -259,9 +257,11 @@ def sum_of_numbers(number, value):
     number = int(number) + int(value)
     return number
 
+
 def positivate_numbers(number):
     number = int(number) * -1
     return number
+
 
 def abs_number(number):
     return  abs(int(number))
@@ -281,12 +281,15 @@ def get_match_from_string(string, pattern, group):
         return m.group(int(group))
     return result
 
+
 def get_percent(value):
     value = value * 100
     return format(value, '.0f')
 
+
 def get_conversion_to_int(value):
     return int(float(value))
+
 
 def get_cause(cause_text):
     cause_dictionary = {

@@ -93,8 +93,6 @@ ${tender_data_lot_question.questions[0].title}  //span[contains(@class, 'questio
 ${tender_data_lot_question.questions[0].description}  (//div[@class='question-div']/div[1])[1]
 ${tender_data_lot_question.questions[0].answer}  (//div[@class='question-div']/div[1])[2]
 
-#${tender_data_lot_question.questions[0].id}  //div[@class='question-div question-expanded']/div[1]
-
 ${tender_data_feature.featureOf}  /../../../*[1]
 
 ${tender_data_complaint.complaintID}  //span[@data-id='complaint-id']
@@ -256,10 +254,8 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
     Wait Until Element Is Visible  ${tender_data_title}  ${COMMONWAIT}
 
 
-
 Створити план
     [Arguments]  ${username}  ${tender_data}
-
     ${presence}=  Run Keyword And Return Status  List Should Contain Value  ${tender_data.data}  lots
     @{lots}=  Run Keyword If  ${presence}  Get From Dictionary  ${tender_data.data}  lots
     ${presence}=  Run Keyword And Return Status  List Should Contain Value  ${tender_data.data}  items
@@ -289,7 +285,6 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
 
     Click Element  xpath=//button[@data-id='actSave']
 
-
     #Заповнити лоти та предмети закупівлі
     Додати предмети закупівлі в план  ${items}
     Click Element  xpath=//button[@data-id='actSave']
@@ -302,15 +297,18 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
     ${plan_id}  Get Text  xpath=//div[@id='tenderId'][contains(text(),'${date}')]
     [Return]  ${plan_id}
 
+
 Дочекатися зміни статусу
      [Arguments]  ${date}
      Wait Until Keyword Succeeds  10min  1s  Перевірити зміну статусу  xpath=//div[@id='tenderId'][contains(text(),'${date}')]
+
 
 Перевірити зміну статусу
      [Arguments]  ${locator}
      Reload Page
      Sleep  2s
      Wait Until Element Is Enabled  ${locator}
+
 
 Додати предмети закупівлі в план
     [Arguments]  ${items}
@@ -323,6 +321,7 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
     \  Input Text  xpath=(//input[@data-id='quantity'])[${index_xpath}]  ${items[${index}].quantity}
     \  Select From List By Label  xpath=(//select[@data-id='unit'])[${index_xpath}]  ${items[${index}].unit.name}
     \  Set Date In Item  ${index}  deliveryDate  endDate  ${items[${index}].deliveryDate.endDate}
+
 
 Внести зміни в план
     [Arguments]  ${user_name}  ${tenderId}  ${parameter}  ${value}
@@ -343,9 +342,9 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
     Wait Visibility And Click Element  xpath=//button[@data-id='actSend']
     Wait Visibility And Click Element  xpath=//button[@data-id='modal-close']
 
-Внести зміни в план item
-   [Arguments]  ${index}  ${parameter}  ${value}
 
+Внести зміни в план item
+    [Arguments]  ${index}  ${parameter}  ${value}
     ${index_xpath}=  privatmarket_service.sum_of_numbers  ${index}  1
     Wait For Ajax
     Wait Visibility And Click Element  xpath=//button[@data-id='actSave']
@@ -595,8 +594,6 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
     Search By Query  css=input[data-id='query']  ${items[${index}].classification.id}
     Wait Visibility And Click Element  css=button[data-id='actConfirm']
 
-
-
     ${classification_id}=  Get Substring  ${items[${index}].classification.id}  0  5
     ${pre_classification_id}=  Get Substring  ${items[${index}].classification.id}  0  3
     ${classification_status}=  Set Variable If  '${pre_classification_id}' == '33695'  ${False}  ${True}
@@ -670,7 +667,6 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
     Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='item'] [data-id='titleEn']  ${features[2].title_en}
     Wait Element Visibility And Input Text  css=[data-id='item'] [data-id='description']  ${features[2].description}
     Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='item'] [data-id='descriptionEn']  ${features[2].description}
-
 
     @{item_enums}=  Get From Dictionary  ${features[2]}  enum
     ${item_criterion_count}=  Get Length  ${item_enums}
@@ -750,7 +746,6 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
 
 Змінити лот
     [Arguments]  ${user_name}  ${tenderId}  ${lot_id}  ${field}  ${value}
-
     Run Keyword And Return If  'value.amount' == '${field}'  Змінити ${field} лоту  ${value}
     Run Keyword And Return If  'minimalStep.amount' == '${field}'  Змінити ${field} лоту  ${value}
 
@@ -1268,7 +1263,6 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
 Отримати інформацію для item
     [Arguments]  ${index}  ${field_name}
     ${index}=  privatmarket_service.sum_of_numbers  ${index}  1
-
     Run Keyword And Return If  '].description' in ${field_name}  Отримати текст з item  xpath=(//a[@data-id='plan-classifications-toggle'])[${index}]
     Run Keyword And Return If  'quantity' in ${field_name}  Отримати кількості необхідних одиниць об'єкта приведенних до цілих  xpath=(//span[@class='item-count ng-binding'])[${index}]
     Run Keyword And Return If  'unit.name' in ${field_name}  Отримати текст з item  xpath=(//span[contains(@class,'item-unit')])[${index}]
@@ -1277,9 +1271,7 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
     Run Keyword And Return If  'classification.id' in ${field_name}  Отримати текст з item  xpath=(//*[@data-id='item-classif-id'])[${index}]
     Run Keyword And Return If  'deliveryDate.endDate' in ${field_name}  Отримати и привести дату до заданого формату  xpath=(//div[@class='info-item-val normal-font ng-binding'])[${index}]
     ${text_element}=  Get text  ${field_name}
-
     [Return]  ${result}
-
 
 
 Отримати текст з item
@@ -1297,12 +1289,12 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
     [Return]  ${result}
 
 
-
 Отримати и привести дату до заданого формату
     [Arguments]  ${locator}
     ${date}=  Отримати текст з item  ${locator}
     ${result}=  get_time_with_offset_formatted  ${date}  %d.%m.%Y  %Y-%m-%d %H:%M:%S.%f%z
     [Return]  ${result}
+
 
 Відкрити детальну інформацію по плану
     Wait Until Element Is Visible  xpath=//a[contains(@ng-click, 'itemShowTab')]
@@ -1314,6 +1306,7 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
     ${count}=  Get Matching Xpath Count  xpath=//section//a[@class="ng-binding"]
 
     Run Keyword if  ${count} != 0  Відкрити itemObject  ${count}
+
 
 Відкрити itemObject
     [Arguments]  ${count}
@@ -1341,7 +1334,6 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
 
 Отримати інформацію із запитання
     [Arguments]  ${username}  ${tender_uaid}  ${question_id}  ${field_name}
-
     ${element}=  Set Variable If
     ...  'запитання на тендер' in '${TEST_NAME}'  xpath=(//div[contains(@class, 'faq') and contains(., '${question_id}')]${tender_data_question.${field_name}}
     ...  'запитання на всі лоти' in '${TEST_NAME}'  xpath=//div[contains(@class, 'lot-info') and contains(., '${question_id}')]${tender_data_lot_question.${field_name}}
@@ -1513,7 +1505,6 @@ Try To Search Complaint
      Run Keyword If  '${status}' == 'True'  Click Element  ${element}
 
 
-
 Отримати статус пропозиції кваліфікації
     [Arguments]  ${item}
     Wait Until Element Is Visible  xpath=//a[contains(@ng-class, 'lot-parts')]
@@ -1606,14 +1597,6 @@ Try To Search Complaint
 
 Отримати інформацію з stage2TenderID
     ${type}=  Отримати текст елемента  xpath=//div[@class='info-item']//div[2]//span[1]
-##    Wait For Element With Reload  xpath=//*[@id="prozorroHash"]/div/a  1
-##    Click Element  xpath=//*[@id="prozorroHash"]/div/a
-##    ${text}=  Get Text  xpath=//div//h3
-##    ${text_new}=  Strip String  ${text}
-##    @{values_list}=  Split String  ${text_new}
-##    ${result}=  @{values_list}[4]
-##    Reload Page
-##    Go Back
     [Return]  ${type}
 
 
@@ -1741,7 +1724,6 @@ Try To Search Complaint
     Wait Until Element Is Visible  ${tender_data_${element_name}}  ${COMMONWAIT}
     Sleep  5s
     ${status_name}=  Get Element Attribute  ${tender_data_status}@data-tender-status
-#    ${status_type}=  privatmarket_service.get_status_type  ${status_name}
     [Return]  ${status_name}
 
 
@@ -2749,6 +2731,6 @@ Get Item Number
     [Arguments]  ${username}  ${tender_uaid}
 #    debug
 
-активувати другий етап
+Активувати другий етап
     [Arguments]  ${username}  ${tender_uaid}
 #    debug
