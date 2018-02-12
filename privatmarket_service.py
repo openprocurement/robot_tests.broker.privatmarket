@@ -1,18 +1,22 @@
 # coding=utf-8
 
-from munch import munchify as privatmarket_munchify
-from selenium.common.exceptions import StaleElementReferenceException
-from datetime import datetime, timedelta
+import os
+import sys
+from datetime import datetime
 from pytz import timezone
+import re
+import datetime
+import dateutil.parser
 
 
 def modify_test_data(initial_data):
-    #set user name
+    # set user name
     # initial_data['procuringEntity']['name'] = u'Товариство З Обмеженою Відповідальністю \'Мак Медіа Прінт\''
-    initial_data['procuringEntity']['name'] = u'ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ \'СІЛЬСЬКОГОСПОДАРСЬКА ФІРМА \'РУБІЖНЕ\''
-    initial_data['procuringEntity']['contactPoint']['telephone'] = u'+380670444580'
-    initial_data['procuringEntity']['contactPoint']['url'] = u'https://dadadad.com'
-    initial_data['procuringEntity']['identifier']['legalName'] = u'ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ \'СІЛЬСЬКОГОСПОДАРСЬКА ФІРМА \'РУБІЖНЕ\''
+    initial_data['procuringEntity']['name'] = u'Сф Рубіжне'
+    if 'contactPoint' in initial_data['procuringEntity']:
+        initial_data['procuringEntity']['contactPoint']['telephone'] = u'+380670444580'
+        initial_data['procuringEntity']['contactPoint']['url'] = u'https://dadadad.com'
+    initial_data['procuringEntity']['identifier']['legalName'] = u'ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ \'СІЛЬСЬКОГОСПОДАРСЬКА ФІРМА \'Сф РУБІЖНЕ\''
     initial_data['procuringEntity']['identifier']['id'] = u'38580144'
     # initial_data['procuringEntity']['name'] = u'Макстрой Діск, Товариство З Обмеженою Відповідальністю'
     # initial_data['procuringEntity']['name'] = u'ФОП ОГАНІН ОЛЕКСАНДР ПЕТРОВИЧ'
@@ -35,6 +39,8 @@ def get_currency_type(currency):
 def get_month_number(month_name):
     monthes = [u"января", u"февраля", u"марта", u"апреля", u"мая", u"июня",
                u"июля", u"августа", u"сентября", u"октября", u"ноября", u"декабря",
+               u"янв.", u"февр.", u"мар.", u"апр.", u"мая.", u"июн.",
+               u"июл.", u"авг.", u"сент.", u"окт.", u"нояб.", u"дек.",
                u"січ.", u"лют.", u"бер.", u"квіт.", u"трав.", u"черв.",
                u"лип.", u"серп.", u"вер.", u"жовт.", u"лист.", u"груд.",
                u"січня", u"лютого", u"березня", u"квітня", u"травня", u"червня",
@@ -43,10 +49,17 @@ def get_month_number(month_name):
 
 
 def get_time_with_offset(date):
-    date_obj = datetime.strptime(date, "%Y-%m-%d %H:%M")
+    date_obj = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M")
     time_zone = timezone('Europe/Kiev')
     localized_date = time_zone.localize(date_obj)
     return localized_date.strftime('%Y-%m-%d %H:%M:%S.%f%z')
+
+
+def get_time_with_offset_formatted(date, input_format_date, output_format):
+    date_obj = datetime.datetime.strptime(date, input_format_date)
+    time_zone = timezone('Europe/Kiev')
+    localized_date = time_zone.localize(date_obj)
+    return localized_date.strftime(output_format)
 
 
 def get_current_date():
@@ -75,7 +88,8 @@ def get_unit_code(name):
         u'пачка': u'RM',
         u'упаковка': u'PK',
         u'гектар': u'HAR',
-        u'блок': u'D64'
+        u'блок': u'D64',
+        u'Флакон': u'VI'
     }
     expected_name = dictionary.get(name)
     if expected_name:
@@ -129,7 +143,7 @@ def get_unit_name_ru(current_name):
         u'килограмм': {u'килограмм', u'килограмма', u'килограммов', u'кілограми'},
         u'пара': {u'пара', u'пары', u'пар'},
         u'литр': {u'литр', u'литра', u'литров'},
-        u'набор': {u'набір', u'набора', u'наборов'},
+        u'набора': {u'набір', u'набора', u'наборов'},
         u'пачек': {u'пачка', u'пачек', u'пачки'},
         u'метр': {u'метр', u'метра', u'метров'},
         u'лот': {u'лот', u'лоты', u'лотов'},
@@ -140,7 +154,7 @@ def get_unit_name_ru(current_name):
         u'тонны': {u'тонна', u'тонны', u'тонн'},
         u'метр квадратный': {u'метр квадратный', u'метра квадратного', u'метров квадратных'},
         u'километры': {u'километр', u'километров', u'километра'},
-        u'штука': {u'штука', u'штуки', u'штук'},
+        u'штуки': {u'штука', u'штуки', u'штук'},
         u'месяц': {u'месяц', u'месяца', u'месяцев'},
         u'пачка': {u'пачка', u'пачек', u'пачкики'},
         u'упаковка': {u'упаковка', u'упаковок', u'упаковки'},
@@ -167,6 +181,7 @@ def get_classification_type(classifications):
         u'ДК 18-2000': u'ДК018',
         u'ДК003: 2010': u'ДК003',
         u'ДК003:2010': u'ДК003',
+        u'ДК 015-97': u'ДК015',
         u'ДК021': u'CPV'
 
     }
@@ -178,6 +193,7 @@ def get_classification_type(classifications):
 
 
 def get_status_type(status_name):
+    status_name = status_name.strip()
     type_dictionary = {
         u'Период уточнений': 'active.enquiries',
         u'Період уточнень': 'active.enquiries',
@@ -197,14 +213,20 @@ def get_status_type(status_name):
         u'Відмінено': 'cancelled',
         u'Розглядається': 'pending',
         u'Кваліфікація учасника': 'active.pre-qualification',
-        u'Пауза перед аукціоном': 'active.pre-qualification.stand-still'
+        u'Пауза перед аукціоном': 'active.pre-qualification.stand-still',
+        u'Прекваліфікація': 'active.pre-qualification',
+        u'Преквалификация': 'active.pre-qualification'
     }
     type_name = type_dictionary.get(status_name)
     return type_name
 
 
 def convert_float_to_string(number):
-    return format(number, '.2f')
+    result = number
+    if type(number) is float:
+        return format(number, '.2f')
+    else:
+        return result
 
 
 def get_claim_status (status):
@@ -222,9 +244,29 @@ def get_claim_status (status):
     return type_name
 
 
+def get_procurementMethod_Type (type):
+    type_dictionary = {
+        u'Конкурентний діалог з публікацією англ. мовою': 'competitiveDialogueEU',
+        u'Конкурентний діалог': 'competitiveDialogueUA',
+        u'Переговорна процедура для потреб оборони': 'aboveThresholdUA.defense'
+
+    }
+    type_name = type_dictionary.get(type)
+    return type_name
+
+
 def sum_of_numbers(number, value):
     number = int(number) + int(value)
     return number
+
+
+def positivate_numbers(number):
+    number = int(number) * -1
+    return number
+
+
+def abs_number(number):
+    return  abs(int(number))
 
 
 def get_abs_item_index(lot_index, item_index, items_count):
@@ -232,9 +274,23 @@ def get_abs_item_index(lot_index, item_index, items_count):
     return abs_index
 
 
+def get_match_from_string(string, pattern, group):
+    result = 'null';
+    p = re.compile(pattern)
+    m = p.search(string)
+
+    if p.search(string):
+        return m.group(int(group))
+    return result
+
+
 def get_percent(value):
     value = value * 100
     return format(value, '.0f')
+
+
+def get_conversion_to_int(value):
+    return int(float(value))
 
 
 def get_cause(cause_text):
@@ -260,3 +316,30 @@ def get_items_from_lot(items, lot_id):
         if item['relatedLot'] == lot_id:
             lot_items.append(item)
     return lot_items
+
+
+def get_ECP_key():
+    return os.path.join(os.getcwd(), 'src/robot_tests.broker.privatmarket/Key-6.dat')
+
+
+def get_ECP_key2(path):
+    return os.path.join(os.getcwd(), path)
+
+
+def get_date_formatting(date,format_day):
+    return dateutil.parser.parse(date).date().strftime(format_day)
+
+
+def get_scenarios_name():
+    name = ''
+    for param in sys.argv:
+        if 'txt' in param:
+            name = param
+    return name
+
+
+def is_click_button(lot_index, item_index):
+    status = 'true'
+    if int(item_index) == 1 and int(lot_index) == 1:
+        return 'false'
+    return status
