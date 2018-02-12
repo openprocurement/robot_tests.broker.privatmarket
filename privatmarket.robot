@@ -2729,8 +2729,8 @@ Get Item Number
 
 Перевести тендер на статус очікування обробки мостом
     [Arguments]  ${username}  ${tender_uaid}
-#    debug
+    Fail  Test not ready
 
 Активувати другий етап
     [Arguments]  ${username}  ${tender_uaid}
-#    debug
+    Fail  Test not ready
