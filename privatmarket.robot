@@ -1224,7 +1224,7 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
     Run Keyword Unless  'checked-item' in '${info_class}'  Click Element  ${info}
     ${element}=  Set Variable  xpath=(//div[@class='lot-info']/section[contains(., '${object_id}')]${tender_data_item.${field_name}}
 
-    Run Keyword And Return If  '${field_name}' == 'deliveryDate.startDate'  Отримати дату та час  ${element}
+    Run Keyword And Return If  '${field_name}' == 'deliveryDate.startDate'  Отримати інформацію з deliveryDate  ${element}
     Run Keyword And Return If  '${field_name}' == 'deliveryDate.endDate'  Отримати інформацію з deliveryDate  ${element}
     Run Keyword And Return If  '${field_name}' == 'deliveryLocation.latitude'  Отримати число  ${element}  0
     Run Keyword And Return If  '${field_name}' == 'deliveryLocation.longitude'  Отримати число  ${element}  0
