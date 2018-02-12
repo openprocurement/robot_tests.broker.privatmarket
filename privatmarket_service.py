@@ -1,3 +1,5 @@
+# coding=utf-8
+
 import os
 import sys
 from datetime import datetime
@@ -8,7 +10,7 @@ import dateutil.parser
 
 
 def modify_test_data(initial_data):
-    #set user name
+    # set user name
     # initial_data['procuringEntity']['name'] = u'Товариство З Обмеженою Відповідальністю \'Мак Медіа Прінт\''
     initial_data['procuringEntity']['name'] = u'Сф Рубіжне'
     if 'contactPoint' in initial_data['procuringEntity']:
