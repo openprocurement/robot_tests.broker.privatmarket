@@ -191,7 +191,6 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
 Пошук тендера по ідентифікатору
     [Arguments]  ${username}  ${tenderId}
     Go To  ${USERS.users['${username}'].homepage}
-#    Close notification
     Wait Until Element Is Visible  ${locator_tenderSearch.searchInput}  timeout=${COMMONWAIT}
 
     ${class}=  Get Element Attribute  xpath=//span[@data-id='pinhead']@class
@@ -210,7 +209,6 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
 Пошук плану по ідентифікатору
   [Arguments]  ${username}  ${tenderId}
     Go To  ${USERS.users['${username}'].homepage}
-#    Close notification
     Wait Until Element Is Visible  ${locator_tenderSearch.searchInput}  timeout=${COMMONWAIT}
 
     ${class}=  Get Element Attribute  xpath=//span[@data-id='pinhead']@class
@@ -262,8 +260,6 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
     @{items}=  Run Keyword If  ${presence}  Get From Dictionary  ${tender_data.data}  items
     ${presence}=  Run Keyword And Return Status  List Should Contain Value  ${tender_data.data}  features
     @{features}=  Run Keyword If  ${presence}  Get From Dictionary  ${tender_data.data}  features
-
-    log to console    ${tender_data.data}
 
     Wait Visibility And Click Element  ${locator_tenderSearch.addTender}
     Wait Visibility And Click Element  xpath=(//a[@data-toggle='tab'])[2]
@@ -418,7 +414,7 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
     @{items}=  Run Keyword If  ${presence}  Get From Dictionary  ${tender_data.data}  items
     ${presence}=  Run Keyword And Return Status  List Should Contain Value  ${tender_data.data}  features
     @{features}=  Run Keyword If  ${presence}  Get From Dictionary  ${tender_data.data}  features
-#    Close notification
+
     Wait Until Element Is Visible  ${locator_tenderSearch.searchInput}  ${COMMONWAIT}
     Check Current Mode New Realisation
 
@@ -1970,11 +1966,6 @@ Try To Search Complaint
     Wait Visibility And Click Element  xpath=//section[@data-id='schemeCheckModal']//label[@for='scheme_${scheme}']
     Wait Visibility And Click Element  xpath=//section[@data-id='schemeCheckModal']//button[@data-id='actConfirm']
     Sleep  1
-
-
-Close notification
-    ${notification_visibility}=  Run Keyword And Return Status  Wait Until Element Is Visible  css=section[data-id='popupHelloModal'] span[data-id='actClose']
-    Run Keyword If  ${notification_visibility}  Click Element  css=section[data-id='popupHelloModal'] span[data-id='actClose']
 
 
 Switch To Frame

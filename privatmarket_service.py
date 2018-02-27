@@ -249,7 +249,6 @@ def get_procurementMethod_Type (type):
         u'Конкурентний діалог з публікацією англ. мовою': 'competitiveDialogueEU',
         u'Конкурентний діалог': 'competitiveDialogueUA',
         u'Переговорна процедура для потреб оборони': 'aboveThresholdUA.defense'
-
     }
     type_name = type_dictionary.get(type)
     return type_name
