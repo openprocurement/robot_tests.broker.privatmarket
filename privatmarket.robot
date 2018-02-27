@@ -2024,8 +2024,6 @@ Try Search Tender
 Check Current Mode New Realisation
     [Arguments]  ${education_type}=${True}
     privatmarket.Оновити сторінку з тендером
-#    Close notification
-    #проверим правильный ли режим
     Wait Until Element Is Visible  ${locator_tender.switchToDemo}  ${COMMONWAIT}
     Wait Visibility And Click Element  ${locator_tender.switchToDemo}
     Wait For Ajax
