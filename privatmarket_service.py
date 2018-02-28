@@ -259,13 +259,8 @@ def sum_of_numbers(number, value):
     return number
 
 
-def positivate_numbers(number):
-    number = int(number) * -1
-    return number
-
-
 def abs_number(number):
-    return  abs(int(number))
+    return abs(int(number))
 
 
 def get_abs_item_index(lot_index, item_index, items_count):
@@ -317,11 +312,7 @@ def get_items_from_lot(items, lot_id):
     return lot_items
 
 
-def get_ECP_key():
-    return os.path.join(os.getcwd(), 'src/robot_tests.broker.privatmarket/Key-6.dat')
-
-
-def get_ECP_key2(path):
+def get_ECP_key(path):
     return os.path.join(os.getcwd(), path)
 
 

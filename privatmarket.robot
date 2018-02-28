@@ -1007,7 +1007,7 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
     Select Window  name=signWin
     Wait Until Element Is Visible  id=CAsServersSelect
     Wait Visibility And Click Element  xpath=//select[@id='CAsServersSelect']//option[8]
-    ${path}=   get_ECP_key2  src/robot_tests.broker.privatmarket/boss.jks
+    ${path}=   get_ECP_key  src/robot_tests.broker.privatmarket/boss.jks
     Choose File  id=PKeyFileInput  ${path}
     Wait Element Visibility And Input Text  id=PKeyPassword  1111111111
     Wait Visibility And Click Element  id=PKeyReadButton
