@@ -201,7 +201,7 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
     ...  ELSE  Set Variable  True
 
     Wait For Tender  ${tenderId}  ${education_type}
-    Wait Visibility And Click Element  xpath=//tr[@id='${tenderId}']
+    Wait Visibility And Click Element  xpath=//div[@id='${tenderId}']
     Sleep  5s
     Wait Until Element Is Visible  ${tender_data_title}  ${COMMONWAIT}
 
@@ -223,7 +223,7 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
     ${type}=  Set Variable  plan
     Wait For Tender  ${tenderId}  ${education_type}  ${type}
 
-    Wait Visibility And Click Element  xpath=//tr[@id='${tenderId}']
+    Wait Visibility And Click Element  xpath=//div[@id='${tenderId}']
     Sleep  5s
     Wait Until Element Is Visible  ${tender_data_tenderID}  ${COMMONWAIT}
 
@@ -247,7 +247,7 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
     Wait For Tender  ${tenderId}  ${education_type}
     Run Keyword If  ${funder_id} == '44000'  Wait Visibility And Click Element  xpath=//select[@ng-model='template.funder']/option[contains(., 'Світовий Банк')]
     Sleep  5s
-    Wait Visibility And Click Element  xpath=//tr[@id='${tenderId}']
+    Wait Visibility And Click Element  xpath=//div[@id='${tenderId}']
     Sleep  5s
     Wait Until Element Is Visible  ${tender_data_title}  ${COMMONWAIT}
 
