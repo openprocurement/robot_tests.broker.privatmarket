@@ -2553,8 +2553,11 @@ Get Item Number
     ${value_amount}=  privatmarket_service.convert_float_to_string  ${bid.data.lotValues[0].value.amount}
     Sleep  2s
 
-    ${elements}=  Get Webelements  xpath=//button[contains(@id, 'dropdownMenu')]
-    ${count}=  Get_Length  ${elements}
+    ${status}  ${elements}=  Run Keyword And Ignore Error  Get Webelements  xpath=//button[contains(@id, 'dropdownMenu')]
+    ${count}=  Run Keyword If
+    ...  '${status}' == 'PASS'  Get_Length  ${elements}
+    ...  ELSE  Set Variable  0
+
     :FOR  ${item}  In Range  0  ${count}
     \  ${item}=  privatmarket_service.sum_of_numbers  ${item}  1
     \  Click Element  xpath=(//button[contains(@id, 'dropdownMenu')])[${item}]
