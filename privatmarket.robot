@@ -1580,7 +1580,7 @@ Try To Search Complaint
     Sleep  2s
     Wait Visibility And Click Element  id=btnSendAnswer
     Wait For Notification  Ваша відповідь успішно відправлена!
-    Wait Visibility And Click Element  css=span[ng-click='act.hideModal()']
+    Wait Visibility And Click Element  css=button[data-id='btn-close']
     Sleep  90s
 
 
@@ -2551,8 +2551,16 @@ Get Item Number
     Wait For Element With Reload  xpath=//button[@data-id='createBidBtn']  1
     Click Element  xpath=//button[@data-id='createBidBtn']
     ${value_amount}=  privatmarket_service.convert_float_to_string  ${bid.data.lotValues[0].value.amount}
-
     Sleep  2s
+
+    ${elements}=  Get Webelements  xpath=//button[contains(@id, 'dropdownMenu')]
+    ${count}=  Get_Length  ${elements}
+    :FOR  ${item}  In Range  0  ${count}
+    \  ${item}=  privatmarket_service.sum_of_numbers  ${item}  1
+    \  Click Element  xpath=(//button[contains(@id, 'dropdownMenu')])[${item}]
+    \  Click Element  xpath=(//ul[@class='dropdown-menu btn-feature-dropdown-menu'])[${item}]/li[1]
+    \  Sleep  1s
+
     Run Keyword Unless  'Неможливість' in '${TEST_NAME}'  Wait Element Visibility And Input Text  css=input[data-id='lot-user-price']  ${value_amount}
     Click Button  css=button[data-id='save-bid-btn']
     Wait For Ajax
