@@ -84,7 +84,7 @@ ${tender_data_lot.minimalStep.valueAddedTaxIncluded}  //div[@id='lotMinStepTax']
 
 ${tender_data_question.title}  //span[contains(@class, 'question-title')])
 ${tender_data_question.description}  //div[@class='question-div']/div[1])
-${tender_data_question.answer}  //div[@class='question-div question-expanded']/div[1])
+${tender_data_question.answer}  //div[@data-id='tender-question-answer']//div[@class='question-div']/div[1])
 
 ${tender_data_lot_question.title}  //span[contains(@class, 'question-title')]
 ${tender_data_lot_question.description}  //div[@class='question-div']/div[1]
