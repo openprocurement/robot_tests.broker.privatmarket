@@ -1058,7 +1058,7 @@ ${tender_data_classification.id}  xpath=//*[@data-id='common-classif-id']
     \  ${item}=  privatmarket_service.sum_of_numbers  ${item}  1
     \  ${class}=  Get Element Attribute  xpath=(//a[contains(@ng-class, 'lot-faq')])[${item}]@class
     \  Run Keyword Unless  'checked-item' in '${class}'  Click Element  xpath=(//a[contains(@ng-class, 'lot-faq')])[${item}]
-    \  Run Keyword If  'відповіді на запитання' in '${TEST_NAME}'  Wait Visibility And Click Element  xpath=(//div[contains(@class, 'question-answer')]//div[contains(@class, 'question-expand-div')]/a[1])[${item}]
+    \  Run Keyword If  'відповіді на запитання' in '${TEST_NAME}'  Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=(//div[contains(@class, 'question-answer')]//div[contains(@class, 'question-expand-div')]/a[1])[${item}]
 
 
 Відкрити інформацію про вкладені файли вимоги
