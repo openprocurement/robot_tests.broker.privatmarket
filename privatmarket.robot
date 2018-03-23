@@ -88,7 +88,7 @@ ${tender_data_question.answer}  //div[@data-id='tender-question-answer']//div[@c
 
 ${tender_data_lot_question.title}  //span[contains(@class, 'question-title')]
 ${tender_data_lot_question.description}  //div[@class='question-div']/div[1]
-${tender_data_lot_question.answer}  //div[@class='question-div question-expanded']/div[1]
+${tender_data_lot_question.answer}  //div[@data-id='lot-question-answer']//div[@class='question-div']/div[1]
 ${tender_data_lot_question.questions[0].title}  //span[contains(@class, 'question-title')]
 ${tender_data_lot_question.questions[0].description}  (//div[@class='question-div']/div[1])[1]
 ${tender_data_lot_question.questions[0].answer}  (//div[@class='question-div']/div[1])[2]
