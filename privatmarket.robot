@@ -2012,7 +2012,7 @@ Wait Element Visibility And Input Text
 
 Wait For Tender
     [Arguments]  ${tender_id}  ${education_type}  ${type}=tender
-    Wait Until Keyword Succeeds  7min  5s  Try Search Tender  ${tender_id}  ${education_type}  ${type}
+    Wait Until Keyword Succeeds  10min  5s  Try Search Tender  ${tender_id}  ${education_type}  ${type}
 
 
 Try Search Tender
@@ -2030,7 +2030,7 @@ Try Search Tender
     #выполним поиск
     Click Element  css=button#search-query-button
     Wait Until Element Is Not Visible  xpath=//div[@class='ajax_overflow']  ${COMMONWAIT}
-    Wait Until Element Is Enabled  id=${tender_id}  timeout=10
+    Wait Until Element Is Enabled  id=${tender_id}  timeout=20
     [Return]  True
 
 
