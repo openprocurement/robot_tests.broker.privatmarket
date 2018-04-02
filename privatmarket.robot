@@ -2570,6 +2570,8 @@ Get Item Number
     Wait Until Element Is Visible  css=select[data-id='filetype']
     Click Button  css=button[data-id='save-bid-btn']
     Wait For Ajax
+    Wait Visibility And Click Element  css=button[data-id='modalOkBtn']
+    Wait For Ajax
 
     ${scenarios_name}=  privatmarket_service.get_scenarios_name
     Run Keyword Unless  'single_item' in '${scenarios_name}' or 'below' in '${scenarios_name}'  Wait Visibility And Click Element  css=label[data-id='toggle-qualified']
@@ -2706,6 +2708,8 @@ Get Item Number
     Wait For Ajax
     Wait Until Element Is Visible  css=select[data-id='filetype']
     Wait Visibility And Click Element  css=button[data-id='save-bid-btn']
+    Wait For Ajax
+    Wait Visibility And Click Element  css=button[data-id='modalOkBtn']
     Wait For Ajax
     Wait Visibility And Click Element  css=button[data-id='save-bid-btn']
     Wait For Ajax
