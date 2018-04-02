@@ -2709,7 +2709,7 @@ Get Item Number
     Wait Until Element Is Visible  css=select[data-id='filetype']
     Wait Visibility And Click Element  css=button[data-id='save-bid-btn']
     Wait For Ajax
-    Wait Visibility And Click Element  css=button[data-id='modalOkBtn']
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  css=button[data-id='modalOkBtn']
     Wait For Ajax
     Wait Visibility And Click Element  css=button[data-id='save-bid-btn']
     Wait For Ajax
