@@ -17,12 +17,17 @@ ${tender_data_rectificationPeriod.endDate}  xpath=(//div[contains(@class, 'timel
 ${tender_data_documents[0].documentType}  xpath=//span[@tid='data.informationDetailstitle']/ancestor::div[1]
 
 ${lot_data_lotID}  xpath=//div[@tid='lotID']
+${lot_data_date}  xpath=//div[@tid='date']
+${lot_data_dateModified}  xpath=//div[@tid='modifyDate']
 ${lot_data_title}  xpath=//div[@tid='data.title']
+${lot_data_rectificationPeriod.endDate}  xpath=//div[@tid='data.rectificationPeriod.endDate']
 ${lot_data_description}  xpath=//div[@tid='description']
 
-${lot_data_decisions[1].title}  xpath=//div[@tid='decision.title']
-${lot_data_decisions[1].decisionDate}  xpath=//div[@tid='decision.date']
-${lot_data_decisions[1].decisionID}  xpath=//div[@tid='decision.id']
+${lot_data_decisions[0].decisionID}  xpath=//div[@tid='decision.0.decisionID']
+${lot_data_decisions[0].decisionDate}  xpath=//div[@tid='decision.0.decisionDate']
+${lot_data_decisions[1].title}  xpath=//div[@tid='decision.1.title']
+${lot_data_decisions[1].decisionDate}  xpath=//div[@tid='decision.1.decisionDate']
+${lot_data_decisions[1].decisionID}  xpath=//div[@tid='decision.1.decisionID']
 
 ${lot_data_assets}  xpath=//div[@tid='asset']
 
@@ -79,7 +84,6 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 
   Set Window Size  @{USERS.users['${username}'].size}
   Set Window Position  @{USERS.users['${username}'].position}
-#  Set Selenium Implicit Wait  10s
   Go To  ${USERS.users['${username}'].homepage}
   Run Keyword Unless  'Viewer' in '${username}'  Login  ${username}
 
@@ -87,7 +91,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 Підготувати дані для оголошення тендера
   [Arguments]  ${username}  ${tender_data}  ${role_name}
   Run Keyword If  '${role_name}' != 'tender_owner'  Return From Keyword  ${tender_data}
-  ${tender_data}=  privatmarket_service.modify_test_data  ${tender_data}
+  ${tender_data}=  modify_test_data  ${tender_data}
   [Return]  ${tender_data}
 
 
@@ -176,6 +180,8 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   ${quantity}=  Convert To String  ${item.quantity}
   Input text  xpath=(//input[@tid='item.quantity'])[last()]  ${quantity}
   Select From List  xpath=(//select[@tid='item.unit.name'])[last()]  ${item.unit.name}
+  Sleep  1s
+  Select From List  xpath=(//select[@tid='registrationDetails.status'])[last()]  string:${item.registrationDetails.status}
 
   #address
   Select Checkbox  xpath=(//input[@tid='item.address.checkbox'])[last()]
@@ -226,9 +232,18 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   [Return]  ${result}
 
 
+Отримати інформацію з рішення
+  [Arguments]  ${field_name}
+  Run Keyword And Return If  '${field_name}' == 'decisions[0].decisionID'  Get Text  ${lot_data_decisions[0].decisionID}
+  Run Keyword And Return If  '${field_name}' == 'decisions[1].title'  Get Text  ${lot_data_decisions[1].title}
+  Run Keyword And Return If  '${field_name}' == 'decisions[1].decisionID'  Get Text  ${lot_data_decisions[1].decisionID}
+  Run Keyword And Return If  'decisionDate' in '${field_name}'  Отримати дату з рішення  ${field_name}
+
+
 Отримати інформацію з активу лоту
   [Arguments]  ${username}  ${tender_id}  ${object_id}  ${field_name}
-  privatmarket.Отримати інформацію з активу об'єкта МП  ${username}  ${tender_id}  ${object_id}  ${field_name}
+  ${result}=  privatmarket.Отримати інформацію з активу об'єкта МП  ${username}  ${tender_id}  ${object_id}  ${field_name}
+  [Return]  ${result}
 
 
 Отримати інформацію із об'єкта МП
@@ -239,8 +254,6 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Run Keyword And Return If  '${field_name}' == 'date'  Отримати creationDate   ${field_name}
   Run Keyword And Return If  '${field_name}' == 'rectificationPeriod.endDate'  Отримати rectificationPeriod.endDate  ${field_name}
   Run Keyword And Return If  '${field_name}' == 'documents[0].documentType'  Отримати documents[0].documentType  ${field_name}
-
-
 
   Wait Until Element Is Visible  ${tender_data_${field_name}}
   ${result_full}=  Get Text  ${tender_data_${field_name}}
@@ -263,7 +276,9 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Run Keyword And Return If  'registrationFee.amount' in '${field_name}'  Отримати розмір реєстраційного внеску аукціону  ${field_name}
   Run Keyword And Return If  'tenderingDuration' in '${field_name}'  Отримати період на подачу пропозицій  ${field_name}
   Run Keyword And Return If  'auctionPeriod.startDate' in '${field_name}'  Отримати дату початку аукціону  ${field_name}
-
+  Run Keyword And Return If  'decisions' in '${field_name}'  Отримати інформацію з рішення  ${field_name}
+  Run Keyword And Return If  'date' in '${field_name}'  Отримати lot_dates  ${field_name}
+  Run Keyword And Return If  '${field_name}' == 'rectificationPeriod.endDate'  Отримати lot_dates  ${field_name}
 
   Wait Until Element Is Visible  ${lot_data_${field_name}}
   ${result_full}=  Get Text  ${lot_data_${field_name}}
@@ -289,38 +304,47 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   [Arguments]  ${field_name}
   ${index}=  Get Regexp Matches  ${field_name}  [(\\d)]  0
   ${result}=  Отримати текст елемента  xpath=//div[@tid="auction.${index[0]}.tenderAttempts"]
+  ${result}=  Convert To Number  ${result}
   [Return]  ${result}
 
 
 Отримати початкову вартість аукціону
   [Arguments]  ${field_name}
   ${index}=  Get Regexp Matches  ${field_name}  [(\\d)]  0
-  ${result}=  Отримати текст елемента  xpath=//div[@tid="auction.${index[0]}.value.amount"]
+  ${result}=  Отримати текст елемента  xpath=//span[@tid="auction.${index[0]}.value.amount"]
   ${result}=  Remove String  ${result}  ${SPACE}
+  ${result}=  Replace String  ${result}  ,  .
+  ${result}=  Convert To Number  ${result}
   [Return]  ${result}
 
 
 Отримати крок аукціону
   [Arguments]  ${field_name}
   ${index}=  Get Regexp Matches  ${field_name}  [(\\d)]  0
-  ${result}=  Отримати текст елемента  xpath=//div[@tid="auction.${index[0]}.minimalStep.amount"]
+  ${result}=  Отримати текст елемента  xpath=//span[@tid="auction.${index[0]}.minimalStep.amount"]
   ${result}=  Remove String  ${result}  ${SPACE}
+  ${result}=  Replace String  ${result}  ,  .
+  ${result}=  Convert To Number  ${result}
   [Return]  ${result}
 
 
 Отримати розмір гарантійного внеску аукціону
   [Arguments]  ${field_name}
   ${index}=  Get Regexp Matches  ${field_name}  [(\\d)]  0
-  ${result}=  Отримати текст елемента  xpath=//div[@tid="auction.${index[0]}.guarantee.amount"]
+  ${result}=  Отримати текст елемента  xpath=//span[@tid="auction.${index[0]}.guarantee.amount"]
   ${result}=  Remove String  ${result}  ${SPACE}
+  ${result}=  Replace String  ${result}  ,  .
+  ${result}=  Convert To Number  ${result}
   [Return]  ${result}
 
 
 Отримати розмір реєстраційного внеску аукціону
   [Arguments]  ${field_name}
   ${index}=  Get Regexp Matches  ${field_name}  [(\\d)]  0
-  ${result}=  Отримати текст елемента  xpath=//div[@tid="auction.${index[0]}.registrationFee.amount"]
+  ${result}=  Отримати текст елемента  xpath=//span[@tid="auction.${index[0]}.registrationFee.amount"]
   ${result}=  Remove String  ${result}  ${SPACE}
+  ${result}=  Replace String  ${result}  ,  .
+  ${result}=  Convert To Number  ${result}
   [Return]  ${result}
 
 
@@ -334,8 +358,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 Отримати дату початку аукціону
   [Arguments]  ${field_name}
   ${index}=  Get Regexp Matches  ${field_name}  [(\\d)]  0
-  ${result}=  Отримати текст елемента  xpath=//div[@tid="auction.${index[0]}.auctionPeriod.startDate"]
-  ${result}=  Remove String  ${result}  ${SPACE}
+  ${result}=  Get Element Attribute  xpath=//div[@tid="auction.${index[0]}.auctionPeriod.startDate"]@tidvalue
   [Return]  ${result}
 
 
@@ -382,7 +405,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   ${doc}=  Set Variable  xpath=//div[@id='fileitem' and contains(., '${doc_id}')]
   ${file_name}=  Get Element Attribute  ${doc}@title
   ${file_url}=  Get Element Attribute  ${doc}@url
-  download_file_from_url  ${file_url}  ${OUTPUT_DIR}${/}${file_name}
+  openprocurement_client_helper.download_file_from_url  ${file_url}  ${OUTPUT_DIR}${/}${file_name}
   Sleep  5s
   [Return]  ${file_name}
 
@@ -434,6 +457,12 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   [Return]  ${result}
 
 
+Отримати lot_dates
+  [Arguments]  ${field_name}
+  ${result}=  Get Element Attribute  ${lot_data_${field_name}}@tidvalue
+  [Return]  ${result}
+
+
 Отримати documents[0].documentType
   [Arguments]  ${field_name}
   ${result}=  Get Element Attribute  ${tender_data_${field_name}}@data-docType
@@ -459,27 +488,9 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   ...  '${text}' == 'Аукціон завершено. Об’єкт не продано'  pending.dissolution
   ...  '${text}' == 'Об’єкт продано'  sold
   ...  '${text}' == 'Об’єкт не продано'  dissolved
-  ...  '${text}' == 'Об’єкт виключено'  deleted
+  ...  '${text}' == 'Об’єкт виключено з переліку'  deleted
   ...  ${element}
   [Return]  ${result}
-
-
-#Отримати тип документа
-#  [Arguments]  ${element}
-#  Reload Page
-#  Sleep  5s
-#  #${element_text}=  Get Text  xpath=//span[@tid='data.statusName']/span[1]  # !!! ПОДОБРАТЬ ЛОКАТОР !!!
-#  ${text}=  Strip String  ${element_text}
-#  ${text}=  Replace String  ${text}  ${\n}  ${EMPTY}
-#  ${result}=  Set Variable If
-#  ...  '${text}' == 'Рішення про затвердження переліку об’єктів, що підлягають приватизації'  notice
-#  ...  '${text}' == 'Інформація про об’єкт малої приватизації'  technicalSpecifications
-#  ...  '${text}' == 'Ілюстрації'  illustration
-#  ...  '${text}' == 'Презентація'  x_presentation
-#  ...  '${text}' == 'Додаткова інформація'  informationDetails
-#  ...  '${text}' == 'Виключення з переліку'  cancellationDetails
-#  ...  ${element}
-#  [Return]  ${result}
 
 
 Отримати дату
@@ -488,6 +499,18 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   ${result_full}=  Get Text  ${tender_data_${field_name}}
   ${result_full}=  Convert Date  ${result_full}  date_format=%d-%m-%Y
   [Return]  ${result_full}
+
+
+Отримати дату з рішення
+  [Arguments]  ${field_name}
+  ${result_full}=  Get Text  ${lot_data_${field_name}}
+  ${result_full}=  Split String  ${result_full}  -
+  ${day_length}=  Get Length  ${result_full[0]}
+  ${day}=  Set Variable If  '${day_length}' == '1'  0${result_full[0]}  ${result_full[0]}
+  ${month}=  Set Variable  ${result_full[1]}
+  ${year}=  Set Variable  ${result_full[2]}
+  ${result}=  Set Variable  ${year}-${month}-${day}
+  [Return]  ${result}
 
 
 Завантажити ілюстрацію в об'єкт МП
@@ -559,9 +582,11 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Input text  xpath=(//input[@tid='item.address.region'])[last()]  ${item.address.region}
   Input text  xpath=(//input[@tid='item.address.streetAddress'])[last()]  ${item.address.streetAddress}
   Input text  xpath=(//input[@tid='item.address.locality'])[last()]  ${item.address.locality}
-  Sleep  2s
+  Sleep  1s
+  Select From List  xpath=(//select[@tid='registrationDetails.status'])[last()]  string:${item.registrationDetails.status}
+  Sleep  1s
   Wait Enable And Click Element  css=button[tid="btn.createasset"]
-  Sleep  30s
+  Wait For Element With Reload  xpath=//div[text()='${item.description}']
 
 
 Login
