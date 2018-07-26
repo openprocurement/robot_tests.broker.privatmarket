@@ -382,7 +382,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   ${doc}=  Set Variable  xpath=//div[@id='fileitem' and contains(., '${doc_id}')]
   ${file_name}=  Get Element Attribute  ${doc}@title
   ${file_url}=  Get Element Attribute  ${doc}@url
-  download_file_from_url  ${file_url}  ${OUTPUT_DIR}${/}${file_name}
+  openprocurement_client_helper.download_file_from_url  ${file_url}  ${OUTPUT_DIR}${/}${file_name}
   Sleep  5s
   [Return]  ${file_name}
 
@@ -462,24 +462,6 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   ...  '${text}' == 'Об’єкт виключено'  deleted
   ...  ${element}
   [Return]  ${result}
-
-
-#Отримати тип документа
-#  [Arguments]  ${element}
-#  Reload Page
-#  Sleep  5s
-#  #${element_text}=  Get Text  xpath=//span[@tid='data.statusName']/span[1]  # !!! ПОДОБРАТЬ ЛОКАТОР !!!
-#  ${text}=  Strip String  ${element_text}
-#  ${text}=  Replace String  ${text}  ${\n}  ${EMPTY}
-#  ${result}=  Set Variable If
-#  ...  '${text}' == 'Рішення про затвердження переліку об’єктів, що підлягають приватизації'  notice
-#  ...  '${text}' == 'Інформація про об’єкт малої приватизації'  technicalSpecifications
-#  ...  '${text}' == 'Ілюстрації'  illustration
-#  ...  '${text}' == 'Презентація'  x_presentation
-#  ...  '${text}' == 'Додаткова інформація'  informationDetails
-#  ...  '${text}' == 'Виключення з переліку'  cancellationDetails
-#  ...  ${element}
-#  [Return]  ${result}
 
 
 Отримати дату
