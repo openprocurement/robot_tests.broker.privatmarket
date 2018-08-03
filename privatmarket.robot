@@ -152,6 +152,64 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   [Return]  ${tender_id}
 
 
+Створити лот
+  [Arguments]  ${user_name}  ${tender_data}  ${asset_id}
+  ${decisions_date}=  Get From Dictionary  ${tender_data.data.decisions[0]}  decisionDate
+  ${decisions_id}=  Get From Dictionary  ${tender_data.data.decisions[0]}  decisionID
+  privatmarket.Пошук об’єкта МП по ідентифікатору  ${user_name}  ${asset_id}
+  Wait Enable And Click Element  css=button[tid='btn.createInfo']
+  ${correctDate}=  Convert Date  ${decisions_date}  result_format=%d/%m/%Y
+  ${correctDate}=  Convert To String  ${correctDate}
+  Input text  xpath=//input[@tid='decision.date']  ${correctDate}
+  Wait Until Element Is Enabled  xpath=//input[@tid='decision.id']  ${COMMONWAIT}
+  Input text  xpath=//input[@tid='decision.id']  ${decisions_id}
+  Execute Javascript  angular.prozorroaccelerator=150;
+  Execute Javascript  angular.prozorroauctionstartdelay = (30+180)*60*1000;
+  Click Element  xpath=//button[@tid='btn.createaInfo']
+  Wait For Ajax
+  Execute Javascript  document.querySelector("span[tid='lotID']").className = ''
+  sleep  2
+  ${tender_id}=  Get Element Attribute  xpath=//span[@tid='lotID']@data-id
+  [Return]  ${tender_id}
+
+
+Додати умови проведення аукціону
+  [Arguments]  ${username}  ${tender_data}  ${index}  ${tender_id}
+  Run Keyword If  '${index}' == '0'
+  ...  Заповнити дані про аукціон  ${tender_data}
+  ...  ELSE  Заповнити тривалість аукціону  ${tender_data}
+
+
+Заповнити дані про аукціон
+  [Arguments]  ${tender_data}
+  ${date}=  Get From Dictionary  ${tender_data.auctionPeriod}  startDate
+  ${correctDate}=  Convert Date Format  ${date}
+  ${value}=  Convert To String  ${tender_data.value.amount}
+  ${guarantee}=  Convert To String  ${tender_data.guarantee.amount}
+  ${minimalStep}=  Convert To String  ${tender_data.minimalStep.amount}
+  ${registrationFee}=  Convert To String  ${tender_data.registrationFee.amount}
+  Wait Enable And Click Element  css=input[tid='valueAddedTaxIncluded']
+  Wait Until Element Is Visible  css=input[tid='auction.value']  ${COMMONWAIT}
+  Input Text  css=input[tid='auction.value']  ${value}
+  Input Text  css=input[tid='auction.guarantee']  ${guarantee}
+  Input Text  css=input[tid='auction.minimalStep']  ${minimalStep}
+  Input Text  css=input[tid='auction.period']  ${correctDate}
+  Input Text  css=input[tid='auction.registrationFee']  ${registrationFee}
+  Input Text  css=input[tid='auction.bankAccount.description']  ${tender_data.bankAccount.description}
+  Input Text  css=input[tid='auction.bankAccount.bankName']  ${tender_data.bankAccount.bankName}
+  Input Text  css=input[tid='auction.bankAccount.accountIdentification.mfo']  ${tender_data.bankAccount.accountIdentification[0].scheme}
+  Input Text  css=input[tid='auction.bankAccount.accountIdentification.crf']  ${tender_data.bankAccount.accountIdentification[0].id}
+
+
+Заповнити тривалість аукціону
+  [Arguments]  ${tender_data}
+  ${duration}=  Get From Dictionary  ${tender_data}  tenderingDuration
+  ${count}=  Set Variable If  '${duration}' == 'P1M'  30
+  Input Text  xpath=//input[@tid='auction.tenderingDuration']  ${count}
+  Click Element  xpath=//button[@tid='btn.createInfo']
+  Wait Until Element Is Visible  ${lot_data_title}  ${COMMONWAIT}
+
+
 Додати рішення
   [Arguments]  ${decision}  ${should_we_click_btn_add_decision}=${False}
   Run Keyword If  ${should_we_click_btn_add_decision}  Wait Visibulity And Click Element  css=button[tid="btn.adddecision"]
@@ -373,6 +431,17 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
     ...  ELSE IF  '${field_name}'== 'decisions[0].title'  Внести зміни в поле  xpath=(//input[@tid="decision.title"])  ${value}
 
 
+Внести зміни в лот
+  [Arguments]  ${user_name}  ${tender_id}  ${field_name}  ${value}
+  Reload Page
+  Sleep  5s
+  Wait Enable And Click Element  xpath=//button[@tid='btn.modifyLot']
+  Завантажити документ про зміни  ${username}  ${tender_id}
+  Run Keyword If
+    ...  '${field_name}' == 'title'  Внести зміни в поле  css=input[tid='lot.title']  ${value}
+    ...  ELSE IF  '${field_name}' == 'description'  Внести зміни в поле  css=textarea[tid="lot.description"]  ${value}
+
+
 Внести зміни в актив об'єкта МП
   [Arguments]  ${user_name}  ${item_id}  ${tender_id}  ${field_name}  ${value}
   Reload Page
@@ -384,20 +453,55 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
     ...  ELSE IF  '${field_name}' == 'description'  Внести зміни в поле  css=textarea[tid="asset.description"]  ${value}
 
 
-Видалити об'єкт МП
-  [Arguments]  ${user_name}  ${tender_id}
+Внести зміни в актив лоту
+  [Arguments]  ${user_name}  ${item_id}  ${tender_id}  ${field_name}  ${value}
   Reload Page
   Sleep  5s
-  Wait Enable And Click Element  css=button[tid='btn.removeAsset']
-  Wait Enable And Click Element  css=button[tid='defaultOk']
-  Wait Until Page Contains  Виключено з переліку  20
+  Wait Enable And Click Element  xpath=//button[@tid='btn.modifyLot']
+  ${quantity}=  Run Keyword If  '${field_name}' == 'quantity'  Convert To String  ${value}
+  Run Keyword If  '${field_name}' == 'quantity'  Run Keywords
+    ...  Завантажити документ про зміни  ${username}  ${tender_id}
+    ...  AND  Внести зміни в поле  xpath=(//input[@tid='item.quantity'])  ${quantity}
+
+
+Внести зміни в умови проведення аукціону
+  [Arguments]  ${username}  ${tender_id}  ${field_name}  ${value}  ${auction_index}
+  Reload Page
+  Sleep  5s
+  Wait Enable And Click Element  xpath=//button[@tid='btn.modifyLot']
+  Завантажити документ про зміни  ${username}  ${tender_id}
+  ${correct_value}=  Run Keyword If
+    ...  'amount' in '${field_name}'  Convert To String  ${value}
+    ...  ELSE IF  '${field_name}' == 'auctionPeriod.startDate'  Convert Date Format  ${value}
+  Run Keyword If
+    ...  '${field_name}' == 'value.amount'  Внести зміни в поле  xpath=(//input[@tid='auction.value'])  ${correct_value}
+    ...  ELSE IF  '${field_name}' == 'minimalStep.amount'  Внести зміни в поле  xpath=(//input[@tid='auction.minimalStep'])  ${correct_value}
+    ...  ELSE IF  '${field_name}' == 'guarantee.amount'  Внести зміни в поле  xpath=(//input[@tid='auction.guarantee'])  ${correct_value}
+    ...  ELSE IF  '${field_name}' == 'registrationFee.amount'  Внести зміни в поле  xpath=(//input[@tid='auction.registrationFee'])  ${correct_value}
+    ...  ELSE IF  '${field_name}' == 'auctionPeriod.startDate'  Внести зміни в поле  xpath=(//input[@tid='auction.period'])  ${correct_value}
+
+
+Видалити об'єкт МП
+  [Arguments]  ${user_name}  ${tender_id}
+  Switch Browser  ${ALIAS_NAME}
+  Reload Page
+  Wait Until Page Contains  Виключено з переліку  60
+
+
+Видалити лот
+  [Arguments]  ${user_name}  ${tender_id}
+  Switch Browser  ${ALIAS_NAME}
+  Reload Page
+  Wait Until Page Contains  Об’єкт виключено  60
 
 
 Внести зміни в поле
   [Arguments]  ${elementLocator}  ${input}
   Wait Until Element Is Visible  ${elementLocator}  ${COMMONWAIT}
   Input Text  ${elementLocator}  ${input}
-  Wait Enable And Click Element  css=button[tid='btn.createasset']
+  Run Keyword If
+    ...  '${MODE}' == 'assets'  Wait Enable And Click Element  css=button[tid='btn.createasset']
+    ...  ELSE IF  '${MODE}' == 'lots'  Wait Enable And Click Element  css=button[tid="btn.createInfo"]
 
 
 Отримати документ
@@ -488,7 +592,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   ...  '${text}' == 'Аукціон завершено. Об’єкт не продано'  pending.dissolution
   ...  '${text}' == 'Об’єкт продано'  sold
   ...  '${text}' == 'Об’єкт не продано'  dissolved
-  ...  '${text}' == 'Об’єкт виключено з переліку'  deleted
+  ...  '${text}' == 'Об’єкт виключено'  deleted
   ...  ${element}
   [Return]  ${result}
 
@@ -501,7 +605,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   [Return]  ${result_full}
 
 
-Отримати дату з рішення
+Отримати дату з рішення
   [Arguments]  ${field_name}
   ${result_full}=  Get Text  ${lot_data_${field_name}}
   ${result_full}=  Split String  ${result_full}  -
@@ -511,6 +615,18 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   ${year}=  Set Variable  ${result_full[2]}
   ${result}=  Set Variable  ${year}-${month}-${day}
   [Return]  ${result}
+
+
+Завантажити документ про зміни
+  [Arguments]  ${username}    ${tender_id}
+  ${file_path}  ${file_name}  ${file_content}=  create_fake_doc
+  Execute Javascript  document.querySelector("input[id='input-doc-info']").className = ''
+  Sleep  2s
+  Choose File  css=input[id='input-doc-info']  ${file_path}
+  Sleep  10s
+  Wait Until Element Is Visible  xpath=(//select[@tid="doc.type"])[last()]
+  Select From List  xpath=(//select[@tid="doc.type"])[last()]  string:technicalSpecifications
+  Sleep  2s
 
 
 Завантажити ілюстрацію в об'єкт МП
@@ -527,6 +643,19 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Wait Enable And Click Element  css=button[tid="btn.createasset"]
 
 
+Завантажити ілюстрацію в лот
+  [Arguments]  ${username}  ${tender_id}  ${image_path}
+  Wait Enable And Click Element  css=button[tid="btn.modifyLot"]
+  Execute Javascript  document.querySelector("input[id='input-doc-info']").className = ''
+  Sleep  2s
+  Choose File  css=input[id='input-doc-info']  ${image_path}
+  Sleep  10s
+  Wait Until Element Is Visible  css=select[tid="doc.type"]
+  Select From List  css=select[tid="doc.type"]  string:illustration
+  Sleep  2s
+  Wait Enable And Click Element  css=button[tid="btn.createInfo"]
+
+
 Завантажити документ в об'єкт МП з типом
   [Arguments]  ${user_name}  ${tender_id}  ${file_path}  ${doc_type}
   Wait Enable And Click Element  css=button[tid="btn.modifyLot"]
@@ -541,18 +670,37 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Wait Enable And Click Element  css=button[tid="btn.createasset"]
 
 
-Завантажити документ для видалення об'єкта МП
-  [Arguments]  ${user_name}  ${tender_id}  ${file_path}
+Завантажити документ в лот з типом
+  [Arguments]  ${user_name}  ${tender_id}  ${file_path}  ${doc_type}
   Wait Enable And Click Element  css=button[tid="btn.modifyLot"]
-  Wait Until Element Is Visible  css=button[tid="btn.createasset"]
-  Execute Javascript  document.querySelector("input[id='input-doc-asset']").className = ''
+  Execute Javascript  document.querySelector("input[id='input-doc-info']").className = ''
   Sleep  2s
-  Choose File  css=input[id='input-doc-asset']  ${file_path}
+  Choose File  css=input[id='input-doc-info']  ${file_path}
   Sleep  10s
   Wait Until Element Is Visible  xpath=(//select[@tid="doc.type"])[last()]
-  Select From List  xpath=(//select[@tid="doc.type"])[last()]  string:cancellationDetails
+  Select From List  xpath=(//select[@tid="doc.type"])[last()]  string:${doc_type}
   Sleep  2s
-  Wait Enable And Click Element  css=button[tid="btn.createasset"]
+  Wait Enable And Click Element  css=button[tid="btn.createInfo"]
+
+
+Завантажити документ в умови проведення аукціону
+  [Arguments]  ${user_name}  ${tender_id}  ${file_path}  ${doc_type}  ${auction_index}
+  privatmarket.Завантажити документ в лот з типом  ${user_name}  ${tender_id}  ${file_path}  ${doc_type}
+
+
+Завантажити документ для видалення об'єкта МП
+  [Arguments]  ${user_name}  ${tender_id}  ${file_path}
+  Wait Enable And Click Element  css=button[tid="btn.cancellationLot"]
+  Execute Javascript  document.querySelector("input[id='docsCancellation']").className = ''
+  Sleep  2s
+  Choose File  css=input[id='docsCancellation']  ${file_path}
+  Sleep  10s
+  Wait Enable And Click Element  css=button[tid='btn.cancellation']
+
+
+Завантажити документ для видалення лоту
+  [Arguments]  ${user_name}  ${tender_id}  ${file_path}
+  privatmarket.Завантажити документ для видалення об'єкта МП  ${user_name}  ${tender_id}  ${file_path}
 
 
 Отримати кількість активів в об'єкті МП
@@ -582,9 +730,11 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Input text  xpath=(//input[@tid='item.address.region'])[last()]  ${item.address.region}
   Input text  xpath=(//input[@tid='item.address.streetAddress'])[last()]  ${item.address.streetAddress}
   Input text  xpath=(//input[@tid='item.address.locality'])[last()]  ${item.address.locality}
-  Sleep  2s
+  Sleep  1s
+  Select From List  xpath=(//select[@tid='registrationDetails.status'])[last()]  string:${item.registrationDetails.status}
+  Sleep  1s
   Wait Enable And Click Element  css=button[tid="btn.createasset"]
-  Sleep  30s
+  Wait For Element With Reload  xpath=//div[text()='${item.description}']
 
 
 Login
@@ -679,6 +829,14 @@ Try Search Element
   Wait Until Element Is Visible  ${locator}  7
   Wait Until Element Is Enabled  ${locator}  5
   [Return]  True
+
+
+Convert Date Format
+  [Arguments]  ${element}
+  ${result}=  Split String  ${element}  T
+  ${date}=  Set Variable  ${result[0]}
+  ${correctDate}=  Convert Date  ${date}  result_format=%d/%m/%Y
+  [Return]  ${correctDate}
 
 
 Отримати текст елемента
