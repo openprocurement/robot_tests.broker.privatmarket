@@ -440,6 +440,8 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Run Keyword If
     ...  '${field_name}' == 'title'  Внести зміни в поле  css=input[tid='lot.title']  ${value}
     ...  ELSE IF  '${field_name}' == 'description'  Внести зміни в поле  css=textarea[tid="lot.description"]  ${value}
+  Wait Until Element Is Enabled  xpath=//button[@tid='btn.modifyLot']  ${COMMONWAIT}
+
 
 
 Внести зміни в актив об'єкта МП
@@ -462,23 +464,27 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Run Keyword If  '${field_name}' == 'quantity'  Run Keywords
     ...  Завантажити документ про зміни  ${username}  ${tender_id}
     ...  AND  Внести зміни в поле  xpath=(//input[@tid='item.quantity'])  ${quantity}
+  Wait Until Element Is Enabled  xpath=//button[@tid='btn.modifyLot']  ${COMMONWAIT}
 
 
 Внести зміни в умови проведення аукціону
   [Arguments]  ${username}  ${tender_id}  ${field_name}  ${value}  ${auction_index}
+  privatmarket.Пошук лоту по ідентифікатору  ${user_name}  ${tender_id}
   Reload Page
   Sleep  5s
   Wait Enable And Click Element  xpath=//button[@tid='btn.modifyLot']
   Завантажити документ про зміни  ${username}  ${tender_id}
   ${correct_value}=  Run Keyword If
     ...  'amount' in '${field_name}'  Convert To String  ${value}
-    ...  ELSE IF  '${field_name}' == 'auctionPeriod.startDate'  Convert Date Format  ${value}
+    ...  ELSE IF  '${field_name}' == 'auctionPeriod.startDate'  Get New Auction Date  ${value}
   Run Keyword If
     ...  '${field_name}' == 'value.amount'  Внести зміни в поле  xpath=(//input[@tid='auction.value'])  ${correct_value}
     ...  ELSE IF  '${field_name}' == 'minimalStep.amount'  Внести зміни в поле  xpath=(//input[@tid='auction.minimalStep'])  ${correct_value}
     ...  ELSE IF  '${field_name}' == 'guarantee.amount'  Внести зміни в поле  xpath=(//input[@tid='auction.guarantee'])  ${correct_value}
     ...  ELSE IF  '${field_name}' == 'registrationFee.amount'  Внести зміни в поле  xpath=(//input[@tid='auction.registrationFee'])  ${correct_value}
+    ...  ELSE IF  '${field_name}' == 'auctionPeriod.startDate'  Змінити дату аукціону  ${correct_value}
     ...  ELSE IF  '${field_name}' == 'auctionPeriod.startDate'  Внести зміни в поле  xpath=(//input[@tid='auction.period'])  ${correct_value}
+  Wait Until Element Is Enabled  xpath=//button[@tid='btn.modifyLot']  ${COMMONWAIT}
 
 
 Видалити об'єкт МП
@@ -837,6 +843,21 @@ Convert Date Format
   ${date}=  Set Variable  ${result[0]}
   ${correctDate}=  Convert Date  ${date}  result_format=%d/%m/%Y
   [Return]  ${correctDate}
+
+
+Get New Auction Date
+  [Arguments]  ${element}
+  ${result}=  Split String  ${element}  T
+  ${date}=  Set Variable  ${result[0]}
+  ${correctDate}=  Convert Date  ${date}  result_format=%d
+  [Return]  ${correctDate}
+
+
+Змінити дату аукціону
+  [Arguments]  ${value}
+  Wait Enable And Click Element  xpath=//button[@tid='auction.period.btn']
+  Wait Enable And Click Element  xpath=(//button[@ng-click='select(dt.date)']//span)[text()='${value}']
+  Wait Enable And Click Element  css=button[tid="btn.createInfo"]
 
 
 Отримати текст елемента
