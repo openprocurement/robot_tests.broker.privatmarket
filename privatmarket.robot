@@ -483,7 +483,6 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
     ...  ELSE IF  '${field_name}' == 'guarantee.amount'  Внести зміни в поле  xpath=(//input[@tid='auction.guarantee'])  ${correct_value}
     ...  ELSE IF  '${field_name}' == 'registrationFee.amount'  Внести зміни в поле  xpath=(//input[@tid='auction.registrationFee'])  ${correct_value}
     ...  ELSE IF  '${field_name}' == 'auctionPeriod.startDate'  Змінити дату аукціону  ${correct_value}
-    ...  ELSE IF  '${field_name}' == 'auctionPeriod.startDate'  Внести зміни в поле  xpath=(//input[@tid='auction.period'])  ${correct_value}
   Wait Until Element Is Enabled  xpath=//button[@tid='btn.modifyLot']  ${COMMONWAIT}
 
 
