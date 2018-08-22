@@ -226,6 +226,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 Заповнити дані про аукціон
   [Arguments]  ${tender_data}
   ${date}=  Get From Dictionary  ${tender_data.auctionPeriod}  startDate
+  ${date}=  Get Substring  ${date}  0  10
   ${correctDate}=  Convert Date  ${date}  result_format=%d/%m/%Y
   ${correctDate}=  Convert To String  ${correctDate}
   ${value}=  Convert To String  ${tender_data.value.amount}
