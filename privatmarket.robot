@@ -226,7 +226,8 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 Заповнити дані про аукціон
   [Arguments]  ${tender_data}
   ${date}=  Get From Dictionary  ${tender_data.auctionPeriod}  startDate
-  ${correctDate}=  increase_date_on_days  ${date}  5
+  ${correctDate}=  Convert Date  ${date}  result_format=%d/%m/%Y
+  ${correctDate}=  Convert To String  ${correctDate}
   ${value}=  Convert To String  ${tender_data.value.amount}
   ${guarantee}=  Convert To String  ${tender_data.guarantee.amount}
   ${minimalStep}=  Convert To String  ${tender_data.minimalStep.amount}
@@ -402,7 +403,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   [Arguments]  ${user_name}  ${tender_id}  ${field_name}
   Run Keyword And Return If  '${field_name}' == 'status'  Отримати status аукціону  ${field_name}
   Run Keyword And Return If  '${field_name}' == 'procurementMethodType'  Get Element Attribute  ${procedure_data_${field_name}}@tidvalue
-  Run Keyword And Return If  '${field_name}' == 'cancellations[0].status'  Get Cancellation Status  ${procedure_data_${field_name}}  # ЗАГЛУШКА (ЧТО ЗА СТАТУС ???)
+  Run Keyword And Return If  '${field_name}' == 'cancellations[0].status'  Get Cancellation Status  ${procedure_data_${field_name}}
   Run Keyword And Return IF  '.amount' in '${field_name}' or '${field_name}' == 'minNumberOfQualifiedBids'  Отримати число  ${procedure_data_${field_name}}
   Run Keyword And Return IF  '${field_name}' == 'tenderPeriod.endDate'  Отримати дату та час  ${procedure_data_${field_name}}
   Run Keyword And Return IF  '${field_name}' == 'auctionPeriod.startDate'  Отримати дату та час  ${procedure_data_${field_name}}

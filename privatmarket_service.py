@@ -38,12 +38,6 @@ def get_time_with_offset(date):
     return localized_date.strftime('%Y-%m-%d %H:%M:%S.%f%z')
 
 
-def increase_date_on_days(date, days):
-    date = dateutil.parser.parse(date).date()
-    date += timedelta(days=int(days))
-    return date.strftime('%d/%m/%Y')
-
-
 def get_accelerator(scenarios):
     m = re.search('/(\w*)', scenarios)
     scenarios = m.group(1)
