@@ -128,6 +128,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   ${items}=  Get From Dictionary  ${tender_data.data}  items
   ${items_number}=  Get Length  ${items}
 
+  Sleep  40s
   Wait Enable And Click Element  css=#simple-dropdown
   Wait Enable And Click Element  css=a[href='#/add-asset']
   Wait Until Element Is Visible  css=input[tid="asset.title"]  ${COMMONWAIT}
@@ -1174,7 +1175,7 @@ Get Cancellation Status
 
 Login
   [Arguments]  ${username}
-  Sleep  15s
+  Sleep  40s
   Wait Enable And Click Element  css=a[ui-sref='modal.login']
   Login with email  ${username}
   ${notification_visibility}=  Run Keyword And Return Status  Wait Until Element Is Visible  css=button[ng-click='later()']
@@ -1217,6 +1218,7 @@ Wait For Ajax
 
 Wait Enable And Click Element
   [Arguments]  ${elementLocator}
+  Wait Until Element Is Visible  ${elementLocator}  ${COMMONWAIT}
   Wait Until Element Is Enabled  ${elementLocator}  ${COMMONWAIT}
   Click Element  ${elementLocator}
   Wait For Ajax
