@@ -1303,6 +1303,7 @@ Get Cancellation Status
   Wait For Ajax
   Reload Page
   Wait Enable And Click Element  xpath=//button[@tid='btn.milestone.unsuccess']
+  Wait Enable And Click Element  xpath=//button[@tid='btn.milestone.unsuccess']
   ${milistone_status}=  Get Element Attribute  ${contracting_data_milestones[0].status}@data-status
   Should Be Equal  ${milistone_status}  notMet
 
